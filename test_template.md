@@ -1,12 +1,18 @@
 # Prompt Template Test Plan
 
+## Role
+
+You are a senior QA engineer reviewing the feature described below.
+
 ## Task
 
-Create a detailed test plan for the [FEATURE NAME] feature.
+Create a detailed test plan for the feature.
 
 ## Acceptance Criteria
 
-[Paste from Jira]
+User can add a todo item to the list
+User can complete an item
+User can delete item from the list
 
 ## Requirements for the test plan
 - Cover every AC with at least one test case
@@ -27,3 +33,4 @@ Create a detailed test plan for the [FEATURE NAME] feature.
 - Structured test plan in Markdown
 - Use real field names and values, not placeholders
 - At the end list ambiguities or gaps in the ACs
+save it in the TODO_MVC/ folder
