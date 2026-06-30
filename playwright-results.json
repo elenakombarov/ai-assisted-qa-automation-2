@@ -1,0 +1,971 @@
+﻿{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "tests/todo.spec.ts",
+      "--trace",
+      "on",
+      "--reporter=json"
+    ],
+    "configFile": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\playwright.config.ts",
+    "rootDir": "C:/Users/elena/Projects/ai-assisted-qa-automation-2/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/elena/Projects/ai-assisted-qa-automation-2/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/elena/Projects/ai-assisted-qa-automation-2/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.61.0",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "todo.spec.ts",
+      "file": "todo.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "TodoMVC ΓÇö Add, Complete, and Delete",
+          "file": "todo.spec.ts",
+          "line": 52,
+          "column": 6,
+          "specs": [
+            {
+              "title": "TC-001: Add a single todo item to the list",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9991,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:25.153Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-022f3-ingle-todo-item-to-the-list-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-06efe16b100e026b53dc",
+              "file": "todo.spec.ts",
+              "line": 53,
+              "column": 3
+            },
+            {
+              "title": "TC-002: Add multiple todo items sequentially",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 10898,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:25.356Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-17f70-ple-todo-items-sequentially-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-0cc574c2e169f42ca86b",
+              "file": "todo.spec.ts",
+              "line": 70,
+              "column": 3
+            },
+            {
+              "title": "TC-003: Mark a todo item as complete",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 10583,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:26.157Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-defc3-ark-a-todo-item-as-complete-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-ad4911ed3a166610d3d2",
+              "file": "todo.spec.ts",
+              "line": 93,
+              "column": 3
+            },
+            {
+              "title": "TC-004: Delete a todo item from the list",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 10266,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:25.232Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-6b37b-e-a-todo-item-from-the-list-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-19c513aeb89624d91757",
+              "file": "todo.spec.ts",
+              "line": 105,
+              "column": 3
+            },
+            {
+              "title": "TC-005: Complete one item while others remain active",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4480,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:40.703Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-6b28e--while-others-remain-active-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-0df219ab5c38fa70ea1f",
+              "file": "todo.spec.ts",
+              "line": 117,
+              "column": 3
+            },
+            {
+              "title": "TC-006: Delete one item from a list of multiple todos",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 3547,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:41.087Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-85c2f-om-a-list-of-multiple-todos-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-fab61b595508cd1d9d38",
+              "file": "todo.spec.ts",
+              "line": 135,
+              "column": 3
+            },
+            {
+              "title": "TC-007: Delete a completed todo item",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 3758,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:43.825Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-5db96-elete-a-completed-todo-item-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-42f6dd3a3616b7ca6878",
+              "file": "todo.spec.ts",
+              "line": 150,
+              "column": 3
+            },
+            {
+              "title": "TC-008: Empty todo is not added when pressing Enter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2109,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:44.087Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-97aed-t-added-when-pressing-Enter-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-4ca74f3a3b064c41880c",
+              "file": "todo.spec.ts",
+              "line": 165,
+              "column": 3
+            },
+            {
+              "title": "TC-009: Whitespace-only input is not added as a todo",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1843,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:45.270Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-b9c85-nput-is-not-added-as-a-todo-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-51a5ef4bdda56a15c187",
+              "file": "todo.spec.ts",
+              "line": 177,
+              "column": 3
+            },
+            {
+              "title": "TC-010: Whitespace-only submission does not affect existing todos",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1601,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:46.626Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-cff6f-s-not-affect-existing-todos-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-4146ce4aa7e8e571f42e",
+              "file": "todo.spec.ts",
+              "line": 188,
+              "column": 3
+            },
+            {
+              "title": "TC-011: Delete button is not available when list is empty",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1299,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:46.712Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-ee869-vailable-when-list-is-empty-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-71368e5672502e554767",
+              "file": "todo.spec.ts",
+              "line": 202,
+              "column": 3
+            },
+            {
+              "title": "TC-012: Completing a todo does not remove it from the All view",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 3231,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:47.724Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-01f2d-remove-it-from-the-All-view-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-ececa9995a64d71136ac",
+              "file": "todo.spec.ts",
+              "line": 210,
+              "column": 3
+            },
+            {
+              "title": "TC-013: Trim leading and trailing whitespace when adding a todo",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2502,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:48.324Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-9f495-itespace-when-adding-a-todo-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-edcbaceace88573b7297",
+              "file": "todo.spec.ts",
+              "line": 221,
+              "column": 3
+            },
+            {
+              "title": "TC-014: Todo text with special characters is stored and displayed",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2718,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:48.327Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-26323-ers-is-stored-and-displayed-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-c441ac02ff62279ed2f5",
+              "file": "todo.spec.ts",
+              "line": 231,
+              "column": 3
+            },
+            {
+              "title": "TC-015: Todo text with Unicode and emoji is stored and displayed",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3697,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:48.483Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-31f2c-oji-is-stored-and-displayed-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-de5e40e34aeeb0acd6da",
+              "file": "todo.spec.ts",
+              "line": 241,
+              "column": 3
+            },
+            {
+              "title": "TC-016: Add two todos with identical text",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 5765,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:51.180Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-83fdd-o-todos-with-identical-text-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-d4de05e3cdc0550cf9b5",
+              "file": "todo.spec.ts",
+              "line": 256,
+              "column": 3
+            },
+            {
+              "title": "TC-017: Very long todo text (500 characters) is accepted and displayed",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5930,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:51.444Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-5bc4b-s-is-accepted-and-displayed-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-63c575090b6462394864",
+              "file": "todo.spec.ts",
+              "line": 267,
+              "column": 3
+            },
+            {
+              "title": "TC-018: Rapid double Enter does not duplicate the same todo",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 5680,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:51.516Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-85477-not-duplicate-the-same-todo-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-6b5867d8d3ea64b5672a",
+              "file": "todo.spec.ts",
+              "line": 284,
+              "column": 3
+            },
+            {
+              "title": "TC-019: Uncomplete a previously completed todo",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6134,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:56.746Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-4e006-a-previously-completed-todo-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-e0247471f23235ea2aea",
+              "file": "todo.spec.ts",
+              "line": 297,
+              "column": 3
+            },
+            {
+              "title": "TC-020: Counter updates correctly when adding, completing, and deleting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 4795,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:57.821Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-fd83f-ing-completing-and-deleting-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-21115909f1806ae0f7d0",
+              "file": "todo.spec.ts",
+              "line": 312,
+              "column": 3
+            },
+            {
+              "title": "TC-021: Footer is hidden when the list is empty",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2488,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:59.694Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-a60fa-dden-when-the-list-is-empty-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-dba817178db9d7b5c3aa",
+              "file": "todo.spec.ts",
+              "line": 330,
+              "column": 3
+            },
+            {
+              "title": "TC-022: Todos persist in localStorage after page reload",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3695,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-26T23:51:59.929Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\elena\\Projects\\ai-assisted-qa-automation-2\\test-results\\todo-TodoMVC-ΓÇö-Add-Complet-1c940-alStorage-after-page-reload-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7c2290300587baf0dfac-ce061a96951649102b13",
+              "file": "todo.spec.ts",
+              "line": 344,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-06-26T23:51:22.316Z",
+    "duration": 42318.10400000001,
+    "expected": 22,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
