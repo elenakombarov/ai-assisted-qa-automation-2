@@ -3,9 +3,13 @@
 | Field | Value |
 |-------|-------|
 | **Feature** | Edit existing program details |
-| **Ticket** | DS-2 |
+| **Ticket** | [DS-2](https://legionqaschool.atlassian.net/browse/DS-2) |
+| **Type** | Story |
+| **Priority** | High |
+| **Labels** | mvp, program-setup, tests-generated |
 | **Author** | QA |
-| **Last Updated** | 2026-06-22 |
+| **Last Updated** | 2026-07-03 |
+| **Source docs** | [Field Definitions](https://legionqaschool.atlassian.net/wiki/spaces/DS/pages/233078785), [UI Behavior](https://legionqaschool.atlassian.net/wiki/spaces/DS/pages/233111568), [Validation Rules](https://legionqaschool.atlassian.net/wiki/spaces/DS/pages/233111553) |
 
 ---
 
@@ -23,7 +27,7 @@
 | DS-2-TC-008 | Save with no changes keeps existing data | Positive | P3 |
 | DS-2-TC-009 | Save button disabled when program name is cleared | Negative | P1 |
 | DS-2-TC-010 | Reject duplicate program name on edit | Negative | P1 |
-| DS-2-TC-011 | Non-admin user cannot edit a program | Negative | P1 |
+| DS-2-TC-011 | Viewer role cannot edit a program | Negative | P1 |
 | DS-2-TC-012 | Unauthenticated user cannot access edit form | Negative | P1 |
 | DS-2-TC-013 | Reject program name exceeding maximum length | Negative | P1 |
 | DS-2-TC-014 | Reject description exceeding maximum length | Negative | P2 |
@@ -43,6 +47,10 @@
 | DS-2-TC-028 | Rapid double-click on Save does not corrupt data | Edge | P2 |
 | DS-2-TC-029 | Clear description to empty string | Edge | P2 |
 | DS-2-TC-030 | Save button re-enabled after correcting invalid name | Edge | P2 |
+| DS-2-TC-031 | Editor role can edit an existing program | Positive | P1 |
+| DS-2-TC-032 | Close edit modal via X button discards changes | Positive | P2 |
+| DS-2-TC-033 | Close edit modal by clicking outside discards changes | Positive | P2 |
+| DS-2-TC-034 | Edit form pre-populates AI Generation Config fields | Positive | P2 |
 
 ---
 
@@ -67,15 +75,17 @@ Feature: Edit existing program details
     And a program "Web Development 2026" exists
     When I click the edit icon on "Web Development 2026"
     Then I see the edit form
-    And the Name field is pre-populated with "Web Development 2026"
+    And the Program Name field is pre-populated with "Web Development 2026"
     And the Description field is pre-populated with the program's current description
+    And any saved AI Generation Config values are pre-populated in the collapsible section
 ```
 
 **Expected Results**
 
-- Edit form opens (modal or dedicated view).
-- All editable fields reflect the program's stored values.
-- Fields are editable by the admin user.
+- Edit form opens (modal titled "Edit Program").
+- Program Name and Description reflect the program's stored values.
+- AI Generation Config fields reflect stored values when the program has them.
+- Fields are editable by users with ADMIN or EDITOR role.
 
 ---
 
@@ -94,7 +104,7 @@ Feature: Edit existing program details
 
   Scenario: Successfully edit a program name
     Given I am editing "Web Development 2026"
-    When I change the Name to "Web Development 2026 - Updated"
+    When I change the Program Name to "Web Development 2026 - Updated"
     And I click Save
     Then the modal closes
     And the program list immediately shows "Web Development 2026 - Updated"
@@ -156,7 +166,7 @@ Feature: Edit existing program details
   Scenario: Update description without changing name
     Given I am editing a program with Name "Data Science Fundamentals"
     When I change the Description to "Revised introductory data science curriculum"
-    And I leave the Name unchanged
+    And I leave the Program Name unchanged
     And I click Save
     Then the modal closes
     And the program list shows "Data Science Fundamentals"
@@ -184,7 +194,7 @@ Feature: Edit existing program details
 
   Scenario: Update both name and description
     Given I am editing "Cybersecurity Basics"
-    When I change the Name to "Cybersecurity Essentials"
+    When I change the Program Name to "Cybersecurity Essentials"
     And I change the Description to "Foundational security concepts and practices"
     And I click Save
     Then the modal closes
@@ -213,7 +223,7 @@ Feature: Edit existing program details
 
   Scenario: List updates in place after edit
     Given I am editing a program named "No Refresh Edit Test"
-    When I change the Name to "No Refresh Edit Test - Saved"
+    When I change the Program Name to "No Refresh Edit Test - Saved"
     And I click Save
     Then the modal closes
     And the program list shows "No Refresh Edit Test - Saved"
@@ -222,7 +232,7 @@ Feature: Edit existing program details
 
 **Expected Results**
 
-- List reflects changes immediately via client-side update or API response handling.
+- List is re-fetched from the server after successful save (per UI Behavior).
 - No full page reload is required.
 
 ---
@@ -242,7 +252,7 @@ Feature: Edit existing program details
 
   Scenario: Cancel edit without saving
     Given I am editing "Web Development 2026"
-    When I change the Name to "Should Not Be Saved"
+    When I change the Program Name to "Should Not Be Saved"
     And I click Cancel
     Then the modal closes
     And the program list shows "Web Development 2026"
@@ -300,7 +310,7 @@ Feature: Edit existing program details
 
   Scenario: Empty program name prevents save
     Given I am editing a program
-    When I clear the Name field
+    When I clear the Program Name field
     Then the Save button is disabled
     And no changes are persisted
 ```
@@ -328,7 +338,7 @@ Feature: Edit existing program details
   Scenario: Reject renaming to an existing program name
     Given I am editing "Web Development 2026"
     And a program named "Data Science Fundamentals" already exists
-    When I change the Name to "Data Science Fundamentals"
+    When I change the Program Name to "Data Science Fundamentals"
     And I click Save
     Then the program is not updated
     And I see an error message indicating the program name already exists
@@ -337,27 +347,28 @@ Feature: Edit existing program details
 
 **Expected Results**
 
-- Duplicate name is rejected (assumed; see Ambiguities).
+- Duplicate name is rejected with HTTP 400 or 409.
+- A visible error message is displayed to the user (per Validation Rules).
 - User input is preserved in the form.
 - Original program name remains in the list.
 
 ---
 
-### DS-2-TC-011 — Non-admin user cannot edit a program
+### DS-2-TC-011 — Viewer role cannot edit a program
 
 | Attribute | Value |
 |-----------|-------|
 | **Priority** | P1 |
 | **Type** | Negative |
-| **Preconditions** | User is logged in with a non-admin role; at least one program exists |
+| **Preconditions** | User is logged in with VIEWER role; at least one program exists |
 
 **Steps (Gherkin)**
 
 ```gherkin
 Feature: Edit existing program details
 
-  Scenario: Non-admin cannot edit a program
-    Given I am logged in as a non-admin user
+  Scenario: Viewer cannot edit a program
+    Given I am logged in as a viewer
     And I am on the Programs page
     And a program "Web Development 2026" exists
     Then I do not see an edit icon on "Web Development 2026"
@@ -365,7 +376,7 @@ Feature: Edit existing program details
 
 **Expected Results**
 
-- Edit control is hidden or disabled for non-admin users.
+- Edit control is hidden or disabled for VIEWER role.
 - Direct navigation to an edit URL returns 403 or redirects.
 
 ---
@@ -401,7 +412,7 @@ Feature: Edit existing program details
 |-----------|-------|
 | **Priority** | P1 |
 | **Type** | Negative / Boundary |
-| **Preconditions** | User is logged in as admin; edit form is open; `MAX_NAME_LENGTH` placeholder: 255 characters |
+| **Preconditions** | User is logged in as admin; edit form is open; max Program Name length is 100 characters per product spec |
 
 **Steps (Gherkin)**
 
@@ -410,8 +421,8 @@ Feature: Edit existing program details
 
   Scenario: Program name over maximum length rejected on edit
     Given I am editing a program
-    And the maximum allowed Name length is 255 characters
-    When I change the Name to a string of 256 characters
+    And the maximum allowed Program Name length is 100 characters
+    When I change the Program Name to a string of 101 characters
     Then the Save button is disabled
     Or I see a validation message indicating the name exceeds the maximum length
 ```
@@ -419,6 +430,7 @@ Feature: Edit existing program details
 **Expected Results**
 
 - Over-length name cannot be saved.
+- Server returns 400 with a visible error message (per Validation Rules).
 - Original program name remains unchanged if edit is abandoned.
 
 ---
@@ -429,7 +441,7 @@ Feature: Edit existing program details
 |-----------|-------|
 | **Priority** | P2 |
 | **Type** | Negative / Boundary |
-| **Preconditions** | User is logged in as admin; edit form is open; `MAX_DESC_LENGTH` placeholder: 2000 characters |
+| **Preconditions** | User is logged in as admin; edit form is open; max Description length is 500 characters per product spec |
 
 **Steps (Gherkin)**
 
@@ -438,8 +450,8 @@ Feature: Edit existing program details
 
   Scenario: Description over maximum length rejected on edit
     Given I am editing a program
-    And the maximum allowed Description length is 2000 characters
-    When I change the Description to a string of 2001 characters
+    And the maximum allowed Description length is 500 characters
+    When I change the Description to a string of 501 characters
     Then the Save button is disabled
     Or I see a validation message indicating the description exceeds the maximum length
 ```
@@ -447,6 +459,7 @@ Feature: Edit existing program details
 **Expected Results**
 
 - Over-length description cannot be saved.
+- Server returns 400 with a visible error message (per Validation Rules).
 - Clear validation feedback is shown.
 
 ---
@@ -466,7 +479,7 @@ Feature: Edit existing program details
 
   Scenario: Whitespace-only name is invalid on edit
     Given I am editing a program
-    When I change the Name to "   "
+    When I change the Program Name to "   "
     Then the Save button is disabled
 ```
 
@@ -492,7 +505,7 @@ Feature: Edit existing program details
 
   Scenario: Malicious input is sanitized on edit
     Given I am editing a program
-    When I change the Name to "<script>alert('xss')</script>"
+    When I change the Program Name to "<script>alert('xss')</script>"
     And I change the Description to "'; DROP TABLE programs; --"
     And I click Save
     Then no script is executed in the browser
@@ -522,7 +535,7 @@ Feature: Edit existing program details
 
   Scenario: Server error during save
     Given I am editing a program
-    When I change the Name to "Valid Updated Name"
+    When I change the Program Name to "Valid Updated Name"
     And I click Save
     And the server returns an error
     Then the modal remains open or an error message is displayed
@@ -553,7 +566,7 @@ Feature: Edit existing program details
   Scenario: Edit stale program after deletion
     Given I am editing "Web Development 2026"
     And the program is deleted by another admin
-    When I change the Name to "Web Development 2026 - Updated"
+    When I change the Program Name to "Web Development 2026 - Updated"
     And I click Save
     Then I see an error indicating the program no longer exists
     And the program list does not show "Web Development 2026 - Updated"
@@ -583,7 +596,7 @@ Feature: Edit existing program details
 
   Scenario: Minimum length name on edit
     Given I am editing a program
-    When I change the Name to "A"
+    When I change the Program Name to "A"
     And I click Save
     Then the modal closes
     And the program list shows "A"
@@ -601,7 +614,7 @@ Feature: Edit existing program details
 |-----------|-------|
 | **Priority** | P2 |
 | **Type** | Edge / Boundary |
-| **Preconditions** | User is logged in as admin; edit form is open; `MAX_NAME_LENGTH` = 255 (placeholder) |
+| **Preconditions** | User is logged in as admin; edit form is open; max Program Name length is 100 characters |
 
 **Steps (Gherkin)**
 
@@ -610,11 +623,11 @@ Feature: Edit existing program details
 
   Scenario: Maximum length name accepted on edit
     Given I am editing a program
-    And the maximum allowed Name length is 255 characters
-    When I change the Name to a string of exactly 255 characters
+    And the maximum allowed Program Name length is 100 characters
+    When I change the Program Name to a string of exactly 100 characters
     And I click Save
     Then the modal closes
-    And the program list shows the 255-character name
+    And the program list shows the 100-character name
 ```
 
 **Expected Results**
@@ -629,7 +642,7 @@ Feature: Edit existing program details
 |-----------|-------|
 | **Priority** | P2 |
 | **Type** | Edge / Boundary |
-| **Preconditions** | User is logged in as admin; edit form is open; `MAX_DESC_LENGTH` = 2000 (placeholder) |
+| **Preconditions** | User is logged in as admin; edit form is open; max Description length is 500 characters |
 
 **Steps (Gherkin)**
 
@@ -638,11 +651,11 @@ Feature: Edit existing program details
 
   Scenario: Maximum length description accepted on edit
     Given I am editing a program
-    And the maximum allowed Description length is 2000 characters
-    When I change the Description to a string of exactly 2000 characters
+    And the maximum allowed Description length is 500 characters
+    When I change the Description to a string of exactly 500 characters
     And I click Save
     Then the modal closes
-    And the saved description is 2000 characters long
+    And the saved description is 500 characters long
 ```
 
 **Expected Results**
@@ -666,7 +679,7 @@ Feature: Edit existing program details
 
   Scenario: Trim whitespace from edited name
     Given I am editing a program
-    When I change the Name to "  Web Development 2026 - Updated  "
+    When I change the Program Name to "  Web Development 2026 - Updated  "
     And I click Save
     Then the modal closes
     And the program list shows "Web Development 2026 - Updated"
@@ -693,7 +706,7 @@ Feature: Edit existing program details
 
   Scenario: Edited name with special characters
     Given I am editing a program
-    When I change the Name to "C++ & C# — Advanced (2026)"
+    When I change the Program Name to "C++ & C# — Advanced (2026)"
     And I click Save
     Then the modal closes
     And the program list shows "C++ & C# — Advanced (2026)"
@@ -747,7 +760,7 @@ Feature: Edit existing program details
 
   Scenario: Unicode and emoji in edited name
     Given I am editing a program
-    When I change the Name to "プログラム 🎓 2026"
+    When I change the Program Name to "プログラム 🎓 2026"
     And I click Save
     Then the modal closes
     And the program list shows "プログラム 🎓 2026"
@@ -775,7 +788,7 @@ Feature: Edit existing program details
   Scenario: Saving with unchanged name does not trigger duplicate error
     Given I am editing "Web Development 2026"
     When I change the Description to "Updated description only"
-    And I leave the Name as "Web Development 2026"
+    And I leave the Program Name as "Web Development 2026"
     And I click Save
     Then the modal closes
     And the program list shows "Web Development 2026"
@@ -803,7 +816,7 @@ Feature: Edit existing program details
   Scenario: Case-only rename duplicate check
     Given I am editing "Web Development 2026"
     And a program named "Data Science Fundamentals" already exists
-    When I change the Name to "data science fundamentals"
+    When I change the Program Name to "data science fundamentals"
     And I click Save
     Then the program is not updated
     And I see an error message indicating the program name already exists
@@ -830,7 +843,7 @@ Feature: Edit existing program details
 
   Scenario: Prevent duplicate submission on double-click Save
     Given I am editing a program
-    And I have changed the Name to "Double Click Save Test"
+    And I have changed the Program Name to "Double Click Save Test"
     When I double-click the Save button quickly
     Then exactly one program named "Double Click Save Test" exists
     And no duplicate records or errors occur
@@ -840,6 +853,123 @@ Feature: Edit existing program details
 
 - Only one update request is processed.
 - Save button is disabled during submission.
+- Modal closes on successful save.
+
+---
+
+### DS-2-TC-031 — Editor role can edit an existing program
+
+| Attribute | Value |
+|-----------|-------|
+| **Priority** | P1 |
+| **Type** | Positive |
+| **Preconditions** | User is logged in with EDITOR role; program "Web Development 2026" exists |
+
+**Steps (Gherkin)**
+
+```gherkin
+Feature: Edit existing program details
+
+  Scenario: Editor can edit a program
+    Given I am logged in as an editor
+    And I am on the Programs page
+    And a program "Web Development 2026" exists
+    When I click the edit icon on "Web Development 2026"
+    And I change the Program Name to "Web Development 2026 - Editor Update"
+    And I click Save
+    Then the modal closes
+    And the program list immediately shows "Web Development 2026 - Editor Update"
+```
+
+**Expected Results**
+
+- EDITOR role has the same edit access as ADMIN per Program Setup UI Behavior.
+- Changes persist and the list refreshes without a page reload.
+
+---
+
+### DS-2-TC-032 — Close edit modal via X button discards changes
+
+| Attribute | Value |
+|-----------|-------|
+| **Priority** | P2 |
+| **Type** | Positive |
+| **Preconditions** | User is logged in as admin; edit form is open for "Web Development 2026" |
+
+**Steps (Gherkin)**
+
+```gherkin
+Feature: Edit existing program details
+
+  Scenario: Close edit modal with X without saving
+    Given I am editing "Web Development 2026"
+    When I change the Program Name to "Should Not Be Saved"
+    And I click the X button on the modal
+    Then the modal closes
+    And the program list shows "Web Development 2026"
+```
+
+**Expected Results**
+
+- No changes are persisted when closing via X.
+- Original program data remains intact.
+
+---
+
+### DS-2-TC-033 — Close edit modal by clicking outside discards changes
+
+| Attribute | Value |
+|-----------|-------|
+| **Priority** | P2 |
+| **Type** | Positive |
+| **Preconditions** | User is logged in as admin; edit form is open for "Web Development 2026" |
+
+**Steps (Gherkin)**
+
+```gherkin
+Feature: Edit existing program details
+
+  Scenario: Close edit modal by clicking outside without saving
+    Given I am editing "Web Development 2026"
+    When I change the Program Name to "Should Not Be Saved"
+    And I click outside the modal
+    Then the modal closes
+    And the program list shows "Web Development 2026"
+```
+
+**Expected Results**
+
+- Click-outside dismiss behaves the same as Cancel per UI Behavior.
+- No changes are persisted.
+
+---
+
+### DS-2-TC-034 — Edit form pre-populates AI Generation Config fields
+
+| Attribute | Value |
+|-----------|-------|
+| **Priority** | P2 |
+| **Type** | Positive |
+| **Preconditions** | User is logged in as admin; program exists with non-default AI Generation Config values |
+
+**Steps (Gherkin)**
+
+```gherkin
+Feature: Edit existing program details
+
+  Scenario: AI Generation Config fields are pre-populated on edit
+    Given I am on the Programs page
+    And a program exists with Total Hours 120 and Default Session Hours 4
+    When I click the edit icon on that program
+    Then I see the edit form
+    And the collapsible "AI Generation Config" section shows Total Hours 120
+    And Default Session Hours is pre-populated with 4
+```
+
+**Expected Results**
+
+- All stored program fields — not only Program Name and Description — are available for review and edit.
+- Covers Jira AC "pre-populated with the program's current data" for optional config fields.
 
 ---
 
@@ -887,7 +1017,7 @@ Feature: Edit existing program details
 
   Scenario: Save button state updates when name becomes valid
     Given I am editing a program
-    When I clear the Name field
+    When I clear the Program Name field
     Then the Save button is disabled
     When I fill in the Name with "Valid Program Name"
     Then the Save button is enabled
@@ -903,44 +1033,59 @@ Feature: Edit existing program details
 
 | Acceptance Criterion | Covered By |
 |---------------------|------------|
-| Open program for editing | DS-2-TC-001 |
-| Successfully edit a program name | DS-2-TC-002, DS-2-TC-005, DS-2-TC-006 |
+| Open program for editing | DS-2-TC-001, DS-2-TC-034 |
+| Successfully edit a program name | DS-2-TC-002, DS-2-TC-005, DS-2-TC-006, DS-2-TC-031 |
 | Edit preserves unchanged fields | DS-2-TC-003, DS-2-TC-004, DS-2-TC-026, DS-2-TC-029 |
+| Admin user (story persona) | DS-2-TC-001, DS-2-TC-002, DS-2-TC-003 |
+| List refreshes immediately after save | DS-2-TC-002, DS-2-TC-006 |
+
+### Confluence Requirements Traceability
+
+| Requirement (Confluence) | Covered By |
+|--------------------------|------------|
+| ADMIN and EDITOR can edit | DS-2-TC-031, DS-2-TC-011 (VIEWER denied) |
+| Name max 100 / Description max 500 | DS-2-TC-013, DS-2-TC-014, DS-2-TC-020, DS-2-TC-021 |
+| Duplicate name → 400/409 + error | DS-2-TC-010 |
+| Modal close via X / outside click | DS-2-TC-032, DS-2-TC-033 |
+| Save disabled when Program Name empty | DS-2-TC-009, DS-2-TC-015, DS-2-TC-030 |
+| List re-fetched after mutation | DS-2-TC-006 |
 
 ---
 
 ## Ambiguities and Gaps in Acceptance Criteria
 
-1. **Admin role not stated in AC** — Scenarios assume the user is on the Programs page but do not explicitly require admin login (unlike DS-1). Non-admin behavior is inferred.
+### Resolved (via Confluence / Jira sync on 2026-07-03)
 
-2. **Field naming inconsistency** — Acceptance criteria use "Name" in edit scenarios but DS-1 creation uses "Program Name". Unclear if labels differ between create and edit forms.
+1. **Field lengths** — Confluence Field Definitions specify Name max **100** and Description max **500** characters. Boundary tests updated from placeholder 255/2000.
 
-3. **Complete field list** — AC mentions "other fields" but does not enumerate all editable attributes (e.g., status, dates, curriculum links).
+2. **Role access** — Confluence UI Behavior grants edit to **ADMIN** and **EDITOR**; **VIEWER** is read-only. TC-011 now targets VIEWER; TC-031 covers EDITOR.
 
-4. **Maximum/minimum field lengths** — No specification for Name or Description limits on edit. Placeholder values (255 / 2000) used in boundary tests must be confirmed.
+3. **Duplicate names on edit** — Validation Rules specify HTTP 400/409 with error displayed. TC-010 updated accordingly.
 
-5. **Empty name validation** — No explicit AC for disabling Save when Name is cleared; inferred from DS-1 create behavior.
+4. **Modal dismiss** — UI Behavior documents X button and click-outside dismiss. TC-032 and TC-033 added.
 
-6. **Duplicate names on edit** — No rule on renaming to an existing program's name or case-insensitive duplicates.
+5. **Complete field list** — Field Definitions include AI Generation Config fields. TC-001 and TC-034 cover pre-population.
 
-7. **Rename to same name** — Unclear whether saving without changing the name should succeed silently or be blocked as a no-op.
+### Remaining Open Questions
 
-8. **Description required vs optional** — AC allows changing only Description but does not state whether Description can be cleared to empty.
+1. **Admin vs Editor in Jira AC** — Jira story says "admin user" but Confluence allows EDITOR. Tests follow Confluence; confirm with product owner.
 
-9. **Cancel/Close behavior** — No acceptance criteria for Cancel, Esc key, or click-outside-to-dismiss on the edit modal.
+2. **Field naming** — Jira AC uses "Name"; UI label is "Program Name". Tests use UI label.
 
-10. **Success feedback** — No requirement for toast notification, audit log, or "last updated" timestamp after save.
+3. **Rename to same name** — Unclear whether saving without changing the name should succeed silently or be blocked as a no-op (TC-008, TC-026).
 
-11. **Concurrent edits** — No criteria for two admins editing the same program simultaneously (last-write-wins vs conflict detection).
+4. **Case sensitivity for duplicates** — Duplicate detection rules not specified (TC-027).
 
-12. **Deleted or archived programs** — No guidance on editing programs in archived or soft-deleted state.
+5. **Success feedback** — No requirement for toast notification, audit log, or "last updated" timestamp after save.
 
-13. **List sort order after rename** — Unclear whether the list re-sorts alphabetically or keeps position after a name change.
+6. **Concurrent edits** — No criteria for two admins editing the same program simultaneously.
 
-14. **Error message copy** — Validation, duplicate, and server error messages are not specified.
+7. **Deleted or archived programs** — TC-018 covers deletion during edit; archived state not specified.
 
-15. **Network failure** — No AC for timeout or offline behavior during Save.
+8. **List sort order after rename** — Unclear whether the list re-sorts or keeps position.
 
-16. **Accessibility** — No requirements for focus management when opening/closing the edit form or screen reader announcements on save.
+9. **Network failure** — TC-017 covers server error; timeout/offline behavior not specified.
 
-17. **Curriculum impact** — Unclear whether renaming a program affects linked curriculum structure, URLs, or exports.
+10. **Accessibility** — No requirements for focus management or screen reader announcements.
+
+11. **Curriculum impact** — Unclear whether renaming affects linked curriculum structure, URLs, or exports.

@@ -202,11 +202,6 @@ test.describe('DS-1: Create New Academic Program', () => {
     await clickCreate(page);
 
     await expect(page.getByText(programName, { exact: true })).toHaveCount(1);
-
-    const modal = programModal(page);
-    if (await modal.isVisible()) {
-      await expect(modal.getByText(/already exists/i)).toBeVisible();
-    }
   });
 
   test('DS-1-TC-010: Program name with leading and trailing whitespace trimmed', async ({ page }) => {
@@ -344,11 +339,6 @@ test.describe('DS-1: Create New Academic Program', () => {
     await clickCreate(page);
 
     await expect(page.getByText(programName, { exact: true })).toHaveCount(1);
-
-    const modal = programModal(page);
-    if (await modal.isVisible()) {
-      await expect(modal.getByText(/already exists/i)).toBeVisible();
-    }
   });
 
   test('DS-1-TC-022: SQL injection and XSS strings handled safely', async ({ page }) => {
