@@ -1,4 +1,5 @@
-import { test, expect, type Page, cacheCleanupAuthFromResponse } from '../fixtures/cleanup.fixture';
+import { test, unauthenticatedTest, expect, type Page, cacheCleanupAuthFromResponse } from '../fixtures/cleanup.fixture';
+import type { Response } from '@playwright/test';
 
 const BASE_URL = (process.env.DIDAXIS_URL ?? 'https://test.didaxis.studio').replace(/\/$/, '');
 const LOGIN_URL = `${BASE_URL}/login`;
@@ -8,31 +9,12 @@ const PROGRAMS_URL = `${BASE_URL}/programs`;
 const MAX_NAME_LENGTH = 255;
 const MAX_DESC_LENGTH = 2000;
 
-function requireEnv(name: 'DIDAXIS_EMAIL' | 'DIDAXIS_PASSWORD'): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return value;
-}
-
 function uniqueName(base: string): string {
   return `${base} ${Date.now()}`;
 }
 
 function programModal(page: Page) {
   return page.getByRole('dialog');
-}
-
-async function loginAsAdmin(page: Page) {
-  const email = requireEnv('DIDAXIS_EMAIL');
-  const password = requireEnv('DIDAXIS_PASSWORD');
-
-  await page.goto(LOGIN_URL);
-  await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Password').fill(password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
-  await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 15_000 });
 }
 
 async function goToProgramsPage(page: Page) {
@@ -65,7 +47,7 @@ async function captureProgramCreate(
   action: () => Promise<void>,
 ) {
   const responsePromise = page.waitForResponse(
-    (resp) => resp.url().includes('/api/programs') && resp.request().method() === 'POST',
+    (resp: Response) => resp.url().includes('/api/programs') && resp.request().method() === 'POST',
   );
   await action();
   const response = await responsePromise;
@@ -132,7 +114,6 @@ async function expectOverLengthBlocked(page: Page) {
 
 test.describe('DS-1: Create New Academic Program', () => {
   test('DS-1-TC-001: Navigate to program creation form as admin', async ({ page }) => {
-    await loginAsAdmin(page);
     await openNewProgramModal(page);
 
     await expect(programModal(page).getByLabel('Program Name')).toBeVisible();
@@ -140,7 +121,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-002: Successfully create a program with valid data', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Web Development 2026');
 
     await openNewProgramModal(page);
@@ -152,14 +132,12 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-003: Create button disabled when Program Name is empty', async ({ page }) => {
-    await loginAsAdmin(page);
     await openNewProgramModal(page);
 
     await expectCreateDisabled(page);
   });
 
   test('DS-1-TC-004: Create program with name and description', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Data Science Fundamentals');
 
     await openNewProgramModal(page);
@@ -171,7 +149,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-005: Create program with empty description', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Cybersecurity Basics');
 
     await openNewProgramModal(page);
@@ -183,7 +160,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-006: Cancel program creation without saving', async ({ page }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Temporary Program');
 
     await openNewProgramModal(page);
@@ -210,7 +186,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(page.getByRole('button', { name: 'New Program' })).not.toBeVisible();
   });
 
-  test('DS-1-TC-008: Unauthenticated user redirected from Programs page', async ({ page }) => {
+  unauthenticatedTest('DS-1-TC-008: Unauthenticated user redirected from Programs page', async ({ page }) => {
     await page.goto(PROGRAMS_URL);
     await expect(page).toHaveURL(/\/login/);
     await expect(page.getByLabel('Email')).toBeVisible();
@@ -218,7 +194,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-009: Duplicate program name rejected', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Web Development 2026');
 
     await createProgram(page, programName, trackProgram, 'Original description');
@@ -230,7 +205,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-010: Program name with leading and trailing whitespace trimmed', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Web Development 2026');
     const paddedName = `  ${programName}  `;
 
@@ -243,7 +217,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-011: Program name with special characters accepted', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('C++ & C# — Advanced (2026)');
 
     await openNewProgramModal(page);
@@ -255,7 +228,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-012: Description with special characters and line breaks', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Multiline Description Test');
     const description = 'Line 1: HTML <tags> & symbols\nLine 2: "quoted" text';
 
@@ -268,7 +240,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-013: Program name at minimum length boundary (1 character)', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = `${Date.now() % 10}`;
 
     await openNewProgramModal(page);
@@ -281,7 +252,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-014: Program name at maximum length boundary', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = `${'A'.repeat(MAX_NAME_LENGTH - 13)} ${Date.now()}`.slice(0, MAX_NAME_LENGTH);
 
     await openNewProgramModal(page);
@@ -293,7 +263,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-015: Program name exceeding maximum length rejected', async ({ page }) => {
-    await loginAsAdmin(page);
     const overMaxName = `${'B'.repeat(MAX_NAME_LENGTH)}${Date.now()}`;
 
     await openNewProgramModal(page);
@@ -302,7 +271,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-016: Description at maximum length boundary', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Max Description Boundary');
 
     await openNewProgramModal(page);
@@ -314,7 +282,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-017: Description exceeding maximum length rejected', async ({ page }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Over Max Description');
 
     await openNewProgramModal(page);
@@ -323,7 +290,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-018: Program name with only whitespace treated as empty', async ({ page }) => {
-    await loginAsAdmin(page);
     await openNewProgramModal(page);
 
     await programModal(page).getByLabel('Program Name').fill('   ');
@@ -331,7 +297,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-019: Create button re-enabled after clearing invalid name', async ({ page }) => {
-    await loginAsAdmin(page);
     await openNewProgramModal(page);
 
     await expectCreateDisabled(page);
@@ -342,7 +307,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-020: New program appears in list without page refresh', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('No Refresh Test Program');
 
     await openNewProgramModal(page);
@@ -355,7 +319,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-021: Program name case sensitivity for duplicates', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Web Development 2026');
 
     await createProgram(page, programName, trackProgram, 'Original');
@@ -367,7 +330,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-022: SQL injection and XSS strings handled safely', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName("<script>alert('xss')</script>");
     const description = "'; DROP TABLE programs; --";
     let dialogShown = false;
@@ -387,7 +349,6 @@ test.describe('DS-1: Create New Academic Program', () => {
   });
 
   test('DS-1-TC-023: Unicode and emoji characters in program name', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('プログラム 🎓 2026');
 
     await openNewProgramModal(page);
@@ -400,7 +361,6 @@ test.describe('DS-1: Create New Academic Program', () => {
 
   test('DS-1-TC-024: Rapid double-click on Create does not duplicate program', async ({ page, trackProgram }) => {
     test.skip(true, 'Known app defect: double-click Create submits twice and creates duplicate programs');
-    await loginAsAdmin(page);
     const programName = uniqueName('Double Click Test');
 
     await openNewProgramModal(page);

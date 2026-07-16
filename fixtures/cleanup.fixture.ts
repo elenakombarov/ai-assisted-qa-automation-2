@@ -4,8 +4,14 @@ import {
   chromium,
   request as playwrightRequest,
   type APIRequestContext,
+  type Page,
+  type Response,
 } from '@playwright/test';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+const fixtureDir = path.dirname(fileURLToPath(import.meta.url));
+const authFile = path.join(fixtureDir, '..', 'playwright', '.auth', 'user.json');
 const BASE_URL = (process.env.DIDAXIS_URL ?? 'https://test.didaxis.studio').replace(/\/$/, '');
 
 const trackedProgramIds = new Set<string>();
@@ -157,6 +163,16 @@ async function getCleanupApiContext(): Promise<{
   };
 }
 
+async function bootstrapAuthenticatedSession(page: Page): Promise<void> {
+  const refreshResponsePromise = page.waitForResponse(
+    (resp: Response) => resp.url().includes('/api/auth/refresh') && resp.request().method() === 'POST',
+  );
+  await page.goto(`${BASE_URL}/`);
+  const refreshResponse = await refreshResponsePromise;
+  cacheCleanupAuthFromResponse(refreshResponse);
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+}
+
 async function deleteTrackedPrograms(): Promise<void> {
   if (trackedProgramIds.size === 0) {
     return;
@@ -187,7 +203,26 @@ async function deleteTrackedPrograms(): Promise<void> {
 
 type TrackProgram = (uuid: string) => void;
 
-export const test = base.extend<{ trackProgram: TrackProgram }, { _workerCleanup: void }>({
+type TestOptions = {
+  unauthenticated: boolean;
+};
+
+type TestFixtures = {
+  trackProgram: TrackProgram;
+};
+
+export const test = base.extend<TestFixtures, TestOptions & { _workerCleanup: void }>({
+  unauthenticated: [false, { option: true }],
+
+  context: async ({ browser, baseURL, unauthenticated }, use) => {
+    const context = await browser.newContext({
+      baseURL,
+      storageState: unauthenticated ? { cookies: [], origins: [] } : authFile,
+    });
+    await use(context);
+    await context.close();
+  },
+
   trackProgram: async ({}, use) => {
     const track: TrackProgram = (uuid) => {
       if (uuid) {
@@ -204,6 +239,17 @@ export const test = base.extend<{ trackProgram: TrackProgram }, { _workerCleanup
     },
     { scope: 'worker', auto: true },
   ],
+});
+
+test.beforeEach(async ({ page, unauthenticated }) => {
+  if (unauthenticated) {
+    return;
+  }
+  await bootstrapAuthenticatedSession(page);
+});
+
+export const unauthenticatedTest = test.extend({
+  unauthenticated: [true, { option: true }],
 });
 
 export { expect };

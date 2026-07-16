@@ -4,7 +4,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const configDir = path.dirname(fileURLToPath(import.meta.url));
+const authFile = path.join(configDir, 'playwright', '.auth', 'user.json');
 
+dotenv.config({ path: path.resolve(configDir, '.env') });
 dotenv.config({ path: path.resolve(configDir, 'TODO_MVC/.env') });
 
 /**
@@ -30,8 +32,7 @@ export default defineConfig({
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    // baseURL: 'http://127.0.0.1:3000',
+    baseURL: (process.env.DIDAXIS_URL ?? 'https://test.didaxis.studio').replace(/\/$/, ''),
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -41,8 +42,16 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+    {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: authFile,
+      },
+      dependencies: ['setup'],
     },
 
     // {

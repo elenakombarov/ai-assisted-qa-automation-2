@@ -1,4 +1,4 @@
-import { test, expect, type Page, cacheCleanupAuthFromResponse } from '../fixtures/cleanup.fixture';
+import { test, unauthenticatedTest, expect, type Page, cacheCleanupAuthFromResponse } from '../fixtures/cleanup.fixture';
 
 const BASE_URL = (process.env.DIDAXIS_URL ?? 'https://test.didaxis.studio').replace(/\/$/, '');
 const LOGIN_URL = `${BASE_URL}/login`;
@@ -8,13 +8,6 @@ const PROGRAMS_URL = `${BASE_URL}/programs`;
 const MAX_NAME_LENGTH = 100;
 const MAX_DESC_LENGTH = 500;
 
-function requireEnv(name: 'DIDAXIS_EMAIL' | 'DIDAXIS_PASSWORD'): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return value;
-}
 function uniqueName(base: string): string {
   const suffix = Date.now().toString().slice(-8);
   const maxBase = MAX_NAME_LENGTH - suffix.length - 1;
@@ -41,10 +34,6 @@ async function login(page: Page, email: string, password: string) {
   await page.getByLabel('Password').fill(password);
   await page.getByRole('button', { name: 'Sign In' }).click();
   await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 15_000 });
-}
-
-async function loginAsAdmin(page: Page) {
-  await login(page, requireEnv('DIDAXIS_EMAIL'), requireEnv('DIDAXIS_PASSWORD'));
 }
 
 async function goToProgramsPage(page: Page) {
@@ -170,7 +159,6 @@ async function closeEditViaX(page: Page) {
 test.describe('DS-2: Edit Existing Program Details', () => {
   test.describe.configure({ timeout: 60_000 });
   test('DS-2-TC-001: Open program for editing with pre-populated form', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Web Development 2026');
     const description = 'Full-stack web development program';
 
@@ -183,7 +171,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-002: Successfully edit program name', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Web Development 2026');
     const updatedName = uniqueName('Web Development 2026 - Updated');
 
@@ -198,7 +185,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-003: Edit preserves unchanged fields when only Description changes', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Web Development 2026');
     const originalDescription = 'Full-stack web development program';
     const updatedDescription = 'Updated full-stack curriculum';
@@ -217,7 +203,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-004: Successfully edit description only', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Data Science Fundamentals');
 
     await createProgram(page, programName, trackProgram, 'Original curriculum');
@@ -230,7 +215,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-005: Successfully edit both name and description', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Cybersecurity Basics');
     const updatedName = uniqueName('Cybersecurity Essentials');
 
@@ -245,7 +229,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-006: Program list updates without page refresh after save', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('No Refresh Edit Test');
     const updatedName = uniqueName('No Refresh Edit Test - Saved');
 
@@ -260,7 +243,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-007: Cancel edit discards changes', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Web Development 2026');
 
     await createProgram(page, programName, trackProgram);
@@ -273,7 +255,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-008: Save with no changes keeps existing data', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Unchanged Program');
 
     await createProgram(page, programName, trackProgram, 'Stable description');
@@ -285,7 +266,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-009: Save button disabled when program name is cleared', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Clear Name Test');
 
     await createProgram(page, programName, trackProgram);
@@ -297,7 +277,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
 
   test('DS-2-TC-010: Reject duplicate program name on edit', async ({ page, trackProgram }) => {
     test.skip(true, 'Known app defect: editing a program name to an existing name succeeds instead of rejecting');
-    await loginAsAdmin(page);
     const firstProgram = uniqueName('Web Development 2026');
     const secondProgram = uniqueName('Data Science Fundamentals');
 
@@ -326,14 +305,13 @@ test.describe('DS-2: Edit Existing Program Details', () => {
     await expect(editButtons).toHaveCount(0);
   });
 
-  test('DS-2-TC-012: Unauthenticated user cannot access edit form', async ({ page, trackProgram }) => {
+  unauthenticatedTest('DS-2-TC-012: Unauthenticated user cannot access edit form', async ({ page, trackProgram }) => {
     await page.goto(PROGRAMS_URL);
     await expect(page).toHaveURL(/\/login/);
     await expect(page.getByLabel('Email')).toBeVisible();
   });
 
   test('DS-2-TC-013: Reject program name exceeding maximum length', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Over Max Name');
 
     await createProgram(page, programName, trackProgram);
@@ -343,7 +321,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-014: Reject description exceeding maximum length', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Over Max Description');
 
     await createProgram(page, programName, trackProgram);
@@ -353,7 +330,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-015: Whitespace-only program name treated as empty', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Whitespace Name Test');
 
     await createProgram(page, programName, trackProgram);
@@ -364,7 +340,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-016: Malicious input (XSS/SQL) handled safely on save', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Safe Edit Test');
     const maliciousName = `<script>alert('xss')</script> ${Date.now()}`.slice(0, MAX_NAME_LENGTH);
     const maliciousDescription = "'; DROP TABLE programs; --";
@@ -386,7 +361,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-017: Edit fails gracefully on server error', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Server Error Test');
     const updatedName = uniqueName('Valid Updated Name');
 
@@ -413,7 +387,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-019: Program name at minimum length boundary (1 character)', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Boundary Min');
     const singleCharName = 'Z';
 
@@ -427,7 +400,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-020: Program name at maximum length boundary', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Max Boundary');
     const maxName = `${'M'.repeat(MAX_NAME_LENGTH - 9)}${Date.now() % 100000}`.slice(0, MAX_NAME_LENGTH);
 
@@ -441,7 +413,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-021: Description at maximum length boundary', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Max Desc Boundary');
 
     await createProgram(page, programName, trackProgram);
@@ -454,7 +425,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-022: Program name with leading and trailing whitespace trimmed', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Web Development 2026');
     const trimmedName = uniqueName('Web Development 2026 - Updated');
     const paddedName = `  ${trimmedName}  `;
@@ -469,7 +439,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-023: Program name with special characters', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Special Chars Base');
     const specialName = uniqueName('C++ & C# — Advanced (2026)');
 
@@ -483,7 +452,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-024: Description with special characters and line breaks', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Multiline Edit');
     const description = 'Line 1: HTML <tags> & symbols\nLine 2: "quoted" text';
 
@@ -498,7 +466,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-025: Unicode and emoji characters in edited fields', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Unicode Base');
     const unicodeName = uniqueName('プログラム 🎓 2026');
 
@@ -512,7 +479,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-026: Rename to same name (no-op) allowed', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Web Development 2026');
 
     await createProgram(page, programName, trackProgram);
@@ -526,7 +492,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
 
   test('DS-2-TC-027: Case-only name change and duplicate detection', async ({ page, trackProgram }) => {
     test.skip(true, 'Known app defect: case-only rename to an existing program name is not rejected');
-    await loginAsAdmin(page);
     const firstProgram = uniqueName('Web Development 2026');
     const secondProgram = uniqueName('Data Science Fundamentals');
 
@@ -544,7 +509,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
 
   test('DS-2-TC-028: Rapid double-click on Save does not corrupt data', async ({ page, trackProgram }) => {
     test.skip(true, 'Known app defect: double-click Save sends multiple PATCH requests');
-    await loginAsAdmin(page);
     const programName = uniqueName('Double Click Save Test');
     const updatedName = uniqueName('Double Click Save Test Saved');
     let patchCount = 0;
@@ -567,7 +531,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-029: Clear description to empty string', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Clear Description');
 
     await createProgram(page, programName, trackProgram, 'Non-empty description');
@@ -581,7 +544,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-030: Save button re-enabled after correcting invalid name', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Re-enable Save Test');
 
     await createProgram(page, programName, trackProgram);
@@ -599,7 +561,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
       'Requires DIDAXIS_EDITOR_EMAIL and DIDAXIS_EDITOR_PASSWORD environment variables',
     );
 
-    await loginAsAdmin(page);
     const programName = uniqueName('Web Development 2026');
     await createProgram(page, programName, trackProgram);
 
@@ -614,7 +575,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-032: Close edit modal via X button discards changes', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Web Development 2026');
 
     await createProgram(page, programName, trackProgram);
@@ -627,7 +587,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-033: Close edit modal by clicking outside discards changes', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('Web Development 2026');
 
     await createProgram(page, programName, trackProgram);
@@ -640,7 +599,6 @@ test.describe('DS-2: Edit Existing Program Details', () => {
   });
 
   test('DS-2-TC-034: Edit form pre-populates AI Generation Config fields', async ({ page, trackProgram }) => {
-    await loginAsAdmin(page);
     const programName = uniqueName('AI Config Program');
 
     await createProgram(page, programName, trackProgram, 'Program with AI config', '120');
