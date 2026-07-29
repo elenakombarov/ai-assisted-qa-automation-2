@@ -8,6 +8,7 @@ const KNOWN_COLOR_CONTRAST_TEXT = [
   'Sign out',
   'Manage academic programs and semesters',
   'No programs yet. Create your first program to get started.',
+  'Duplicate attempt',
 ] as const;
 
 async function getNodeText(page: Page, target: string[]): Promise<string> {
