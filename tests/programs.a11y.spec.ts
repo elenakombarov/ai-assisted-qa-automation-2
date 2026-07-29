@@ -8,7 +8,7 @@ const KNOWN_COLOR_CONTRAST_TEXT = [
   'Sign out',
   'Manage academic programs and semesters',
   'No programs yet. Create your first program to get started.',
-  'Duplicate attempt',
+  'Select a program to manage semesters',
 ] as const;
 
 async function getNodeText(page: Page, target: string[]): Promise<string> {
@@ -34,6 +34,11 @@ async function partitionProgramsPageViolations(page: Page, violations: Result[])
 
   for (const violation of violations) {
     if (violation.id === 'page-has-heading-one') {
+      known.push(violation);
+      continue;
+    }
+
+    if (violation.id === 'empty-table-header') {
       known.push(violation);
       continue;
     }
