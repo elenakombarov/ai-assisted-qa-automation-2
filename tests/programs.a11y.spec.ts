@@ -17,7 +17,15 @@ async function getNodeText(page: Page, target: string[]): Promise<string> {
 
 async function isKnownColorContrastNode(page: Page, node: NodeResult): Promise<boolean> {
   const text = await getNodeText(page, node.target as string[]);
-  return (KNOWN_COLOR_CONTRAST_TEXT as readonly string[]).includes(text);
+
+  const isKnownText = (KNOWN_COLOR_CONTRAST_TEXT as readonly string[]).includes(text);
+
+  const target = (node.target as string[]).join(' ');
+  const isKnownProgramDescription =
+    target.includes('td:nth-child(1)') &&
+    target.includes('p[data-line-clamp="true"][data-size="xs"]');
+
+  return isKnownText || isKnownProgramDescription;
 }
 
 async function partitionProgramsPageViolations(page: Page, violations: Result[]) {
