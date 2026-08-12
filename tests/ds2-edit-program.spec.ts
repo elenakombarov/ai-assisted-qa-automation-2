@@ -15,11 +15,11 @@ function uniqueName(base: string): string {
 }
 
 function programRow(page: Page, name: string) {
-  return page.getByText(name, { exact: true }).locator('xpath=ancestor::tr[1]');
+  return page.getByRole('row').filter({ has: page.getByText(name, { exact: true }) });
 }
 
 async function scrollToProgram(page: Page, name: string) {
-  const locator = page.getByText(name, { exact: true }).first();
+  const locator = programRow(page, name);
   await expect(locator).toBeVisible({ timeout: 10_000 });
   await locator.scrollIntoViewIfNeeded();
 }
@@ -126,7 +126,7 @@ async function expectModalClosed(page: Page) {
 
 async function expectProgramInList(page: Page, name: string) {
   await scrollToProgram(page, name);
-  await expect(page.getByText(name, { exact: true }).first()).toBeVisible();
+  await expect(page.getByText(name, { exact: true })).toBeVisible();
 }
 
 async function expectProgramNotInList(page: Page, name: string) {
@@ -138,13 +138,19 @@ async function expectOverLengthBlockedOnSave(page: Page) {
   const saveButton = modal.getByRole('button', { name: 'Save' });
   const validationMessage = modal.getByText(/maximum|too long|exceed|limit|100|500/i);
 
-  if (await saveButton.isDisabled()) {
-    await expect(saveButton).toBeDisabled();
+  const blockedByDisabled = await expect(saveButton)
+    .toBeDisabled({ timeout: 2_000 })
+    .then(() => true)
+    .catch(() => false);
+  if (blockedByDisabled) {
     return;
   }
 
-  if (await validationMessage.isVisible()) {
-    await expect(validationMessage).toBeVisible();
+  const blockedByValidation = await expect(validationMessage)
+    .toBeVisible({ timeout: 2_000 })
+    .then(() => true)
+    .catch(() => false);
+  if (blockedByValidation) {
     return;
   }
 
@@ -153,7 +159,11 @@ async function expectOverLengthBlockedOnSave(page: Page) {
 }
 
 async function closeEditViaX(page: Page) {
-  await editModal(page).locator('.mantine-Modal-close').click();
+  const modal = editModal(page);
+  await modal
+    .getByRole('button')
+    .filter({ hasNotText: /^(Save|Cancel|Show AI Generation Config)$/i })
+    .click();
 }
 
 test.describe('DS-2: Edit Existing Program Details', () => {

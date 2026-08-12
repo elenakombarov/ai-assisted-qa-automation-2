@@ -33,7 +33,7 @@ export class ProgramsPage {
   }
 
   programRow(name: string): Locator {
-    return this.page.getByText(name, { exact: true }).locator('xpath=ancestor::tr[1]');
+    return this.page.getByRole('row').filter({ has: this.page.getByText(name, { exact: true }) });
   }
 
   deleteButton(name: string): Locator {
@@ -41,7 +41,7 @@ export class ProgramsPage {
   }
 
   async scrollToProgram(name: string): Promise<void> {
-    const locator = this.programNameInList(name).first();
+    const locator = this.programRow(name);
     await locator.waitFor({ state: 'visible', timeout: 10_000 });
     await locator.scrollIntoViewIfNeeded();
   }
