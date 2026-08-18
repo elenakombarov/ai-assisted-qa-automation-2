@@ -1,5 +1,6 @@
 import { type Locator, type Page } from '@playwright/test';
 import { DeleteProgramModal } from './DeleteProgramModal.js';
+import { EditProgramModal } from './EditProgramModal.js';
 import { NewProgramModal } from './NewProgramModal.js';
 
 export class ProgramsPage {
@@ -7,6 +8,7 @@ export class ProgramsPage {
   readonly heading: Locator;
   readonly newProgramButton: Locator;
   readonly newProgramModal: NewProgramModal;
+  readonly editProgramModal: EditProgramModal;
   readonly deleteProgramModal: DeleteProgramModal;
   readonly emptyStateMessage: Locator;
 
@@ -15,6 +17,7 @@ export class ProgramsPage {
     this.heading = page.getByRole('heading', { name: 'Programs' });
     this.newProgramButton = page.getByRole('button', { name: 'New Program' });
     this.newProgramModal = new NewProgramModal(page);
+    this.editProgramModal = new EditProgramModal(page);
     this.deleteProgramModal = new DeleteProgramModal(page);
     this.emptyStateMessage = page.getByText('No programs yet. Create your first program to get started.');
   }
@@ -38,6 +41,15 @@ export class ProgramsPage {
 
   deleteButton(name: string): Locator {
     return this.programRow(name).getByRole('button', { name: `Delete ${name}` });
+  }
+
+  editButton(name: string): Locator {
+    return this.programRow(name).getByRole('button', { name: `Edit ${name}` });
+  }
+
+  async openEditDialog(name: string): Promise<void> {
+    await this.scrollToProgram(name);
+    await this.editButton(name).click();
   }
 
   async scrollToProgram(name: string): Promise<void> {
