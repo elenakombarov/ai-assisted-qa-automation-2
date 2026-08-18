@@ -8,6 +8,7 @@ export class EditProgramModal {
   readonly descriptionInput: Locator;
   readonly saveButton: Locator;
   readonly cancelButton: Locator;
+  readonly closeButton: Locator;
   readonly showAiConfigButton: Locator;
   readonly totalProgramHoursInput: Locator;
   readonly defaultSessionHoursInput: Locator;
@@ -23,6 +24,7 @@ export class EditProgramModal {
     this.descriptionInput = this.dialog.getByRole('textbox', { name: 'Description' });
     this.saveButton = this.dialog.getByRole('button', { name: 'Save' });
     this.cancelButton = this.dialog.getByRole('button', { name: 'Cancel' });
+    this.closeButton = this.dialog.getByRole('banner').getByRole('button');
     this.showAiConfigButton = this.dialog.getByRole('button', { name: /Show AI Generation Config/i });
     this.totalProgramHoursInput = this.dialog.getByLabel('Total Program Hours');
     this.defaultSessionHoursInput = this.dialog.getByLabel('Default Session Hours');
@@ -33,5 +35,9 @@ export class EditProgramModal {
 
   async expandAiGenerationConfig(): Promise<void> {
     await this.showAiConfigButton.click();
+  }
+
+  async closeViaX(): Promise<void> {
+    await this.closeButton.click();
   }
 }
