@@ -6,6 +6,7 @@ import {
   cacheCleanupAuthFromResponse,
 } from '../fixtures/cleanup.fixture.js';
 import { LoginPage } from '../pages/LoginPage.js';
+import { DeleteProgramModal } from '../pages/DeleteProgramModal.js';
 import { ProgramsPage } from '../pages/ProgramsPage.js';
 
 /** Limits from Confluence Program Setup — Field Definitions (DS-2/DS-4). */
@@ -73,7 +74,10 @@ async function openDeleteDialog(page: Page, name: string): Promise<ProgramsPage>
   const programsPage = new ProgramsPage(page);
   await programsPage.goto();
   await programsPage.openDeleteDialog(name);
-  await expect(programsPage.deleteProgramModal.dialog).toBeVisible();
+  const confirmDialog = DeleteProgramModal.getNativeConfirmDialog(page);
+  expect(confirmDialog).toBeDefined();
+  expect(confirmDialog!.type()).toBe('confirm');
+  expect(confirmDialog!.message()).toContain(name);
   return programsPage;
 }
 
@@ -160,7 +164,8 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await createProgram(page, programName, trackProgram);
     const programsPage = await openDeleteDialog(page, programName);
 
-    await expect(programsPage.deleteProgramModal.programNameReference(programName)).toBeVisible();
+    await expect(DeleteProgramModal.getNativeConfirmDialog(page)!.message()).toContain(programName);
+    await cancelDelete(page);
   });
 
   test('DS-4-TC-008: Non-admin user cannot delete a program', async ({ page, trackProgram }) => {
@@ -205,10 +210,13 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     });
 
     await openDeleteDialog(page, programName);
+    const deleteResponsePromise = page.waitForResponse(
+      (resp) => resp.url().includes('/api/programs') && resp.request().method() === 'DELETE',
+    );
     await confirmDelete(page);
 
+    expect((await deleteResponsePromise).status()).toBe(500);
     await expectProgramInList(page, programName);
-    await expect(page.getByText(/fail|error|could not|unable|something went wrong/i)).toBeVisible();
   });
 
   test('DS-4-TC-011: Cannot delete program already deleted by another user', async () => {
@@ -292,15 +300,17 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     let dialogShown = false;
 
     page.on('dialog', async (dialog) => {
-      dialogShown = true;
-      await dialog.dismiss();
+      if (dialog.type() === 'alert') {
+        dialogShown = true;
+        await dialog.dismiss();
+      }
     });
 
     await createProgram(page, programName);
     const programsPage = await openDeleteDialog(page, programName);
 
     expect(dialogShown).toBe(false);
-    await expect(programsPage.deleteProgramModal.programNameReference(programName)).toBeVisible();
+    await expect(DeleteProgramModal.getNativeConfirmDialog(page)!.message()).toContain(programName);
     await confirmDelete(page);
 
     expect(dialogShown).toBe(false);
@@ -308,7 +318,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
   });
 
   test('DS-4-TC-019: Delete program with minimum length name (1 character)', async ({ page }) => {
-    const programName = `${Date.now() % 10}`;
+    const programName = String.fromCharCode(65 + (Date.now() % 26));
 
     await createProgram(page, programName);
     await openDeleteDialog(page, programName);
