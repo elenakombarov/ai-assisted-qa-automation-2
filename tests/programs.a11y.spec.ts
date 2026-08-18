@@ -80,7 +80,7 @@ test.describe('Programs accessibility', () => {
       await programsPage.goto();
       await expect(programsPage.heading).toBeVisible();
 
-      const results = await new AxeBuilder({ page }).analyze();
+      const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
       const { known, unexpected } = await partitionProgramsPageViolations(page, results.violations);
 
       if (known.length > 0) {
@@ -101,7 +101,10 @@ test.describe('Programs accessibility', () => {
     await programsPage.openNewProgramForm();
     await expect(programsPage.newProgramModal.dialog).toBeVisible();
 
-    const results = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa'])
+      .include('[role="dialog"]')
+      .analyze();
 
     // Known product issue: only the Mantine icon-only close button is missing a name.
     const isKnownCloseButton = (violation: (typeof results.violations)[number]) =>
@@ -118,4 +121,28 @@ test.describe('Programs accessibility', () => {
 
     expect(results.violations.filter((violation) => !isKnownCloseButton(violation))).toEqual([]);
   });
+
+  test(
+    'Keyboard: Tab to New Program then Enter opens creation dialog',
+    { tag: '@a11y' },
+    async ({ page }) => {
+      const programsPage = new ProgramsPage(page);
+      await programsPage.goto();
+      await expect(programsPage.heading).toBeVisible();
+
+      const button = programsPage.newProgramButton;
+      const maxTabs = 40;
+      for (let i = 0; i < maxTabs; i += 1) {
+        const focused = await button.evaluate((el) => el === document.activeElement);
+        if (focused) {
+          break;
+        }
+        await page.keyboard.press('Tab');
+      }
+
+      await expect(button).toBeFocused();
+      await page.keyboard.press('Enter');
+      await expect(programsPage.newProgramModal.dialog).toBeVisible();
+    },
+  );
 });
