@@ -15,6 +15,51 @@ Activate when the user asks to:
 - run a DS ticket through the QA workflow
 - coordinate test writing, execution, triage, and bug reporting
 - handle a ticket from analysis through CI result
+- run **Backlog mode** (queue supplied by external trigger)
+
+## Backlog mode
+
+Use when an **external trigger** supplies the queue — Cursor Automation, headless `agent -p run`, or a local batch script. The coordinator **never decides when to start**; it only processes the queue it is given.
+
+### Queue selection (external trigger)
+
+Each run, the trigger fetches DS tickets matching **all** of:
+
+- Project: DS
+- Status: **In Progress**
+- Label: **does not** have `tests-generated`
+
+Pass the resulting ticket keys (max **5** per run) into the coordinator. Skip tickets already labeled `tests-generated`.
+
+### Per-ticket workflow
+
+For each ticket in the queue (in order):
+
+1. **Analyze** — same as step 1 below (Jira via Atlassian MCP, acceptance criteria, artifacts).
+2. **Delegate test creation** to `test-writer`.
+3. **Run** Playwright locally:
+   ```bash
+   npx playwright test <spec-file> --workers=1 --reporter=line
+   ```
+4. **If green:** open **one PR per ticket**, link the Jira ticket in the PR body, add label `tests-generated` via Jira MCP, then proceed to the next ticket.
+5. **If red:** delegate to `triage` (same gates as single-ticket workflow). Do not add `tests-generated` until generation succeeds (green run).
+
+### Repeated identical failure
+
+If the **same** failure (same test title + same error signature) occurs **twice in a row** on one ticket, **stop work on that ticket**, note it in the routing trace, and **move to the next ticket**. Do not loop indefinitely on one ticket.
+
+### PR and Jira gates
+
+- **One PR per ticket** — branch and PR scoped to that ticket's specs/POMs only.
+- **Link the Jira ticket** in the PR description (key + URL).
+- After a **successful** test generation run (green local Playwright), add Jira label **`tests-generated`** so the next backlog run skips the ticket.
+- **Never merge** a PR without explicit human approval.
+- **Never close** a Jira ticket without explicit human approval.
+
+### Backlog budget and report
+
+- Process at most **5 tickets** per run; stop when the queue is exhausted or the budget is reached.
+- End with one **QA Orchestration Report** per ticket processed (routing trace template below), plus a backlog summary: tickets completed, skipped (`tests-generated`), stopped (repeated failure), and PR URLs.
 
 ## Subagents (canonical definitions)
 
@@ -34,6 +79,7 @@ Follow these steps in order. Do not skip steps or reorder gates.
    - Resolve input: Jira key (e.g. `DS-N`), `features/DS-N.feature`, or `Test Cases/DS-N/`.
    - Fetch Jira via Atlassian MCP when a key is provided.
    - Summarize acceptance criteria and expected artifacts before delegating.
+   - **Routing:** DS ticket present → [.cursor/skills/didaxis-ds-qa/SKILL.md](../skills/didaxis-ds-qa/SKILL.md). No ticket, coverage discovery → [.cursor/skills/explore-and-generate/SKILL.md](../skills/explore-and-generate/SKILL.md) (read-only Gherkin plan, then delegate to `test-writer`).
 
 2. **Delegate test creation** to `test-writer`.
    - Provide ticket key, feature path, or test plan path.
@@ -71,11 +117,13 @@ Follow these steps in order. Do not skip steps or reorder gates.
 - **Do not** silently fix tests, push changes, or merge without approval.
 - **Preserve** evidence paths, run IDs, spec paths, and Jira links in the final report.
 - **Do not** modify unrelated files.
+- **Never merge** PRs or **close** Jira tickets without explicit human approval (Backlog mode included).
 - Parent coordinator runs tests; `test-writer` does not. `triage` and `bug-reporter` are read-only.
 
 ## Skills reference (for analysis and review)
 
 - [.cursor/skills/didaxis-ds-qa/SKILL.md](../skills/didaxis-ds-qa/SKILL.md) — DS ticket layout and conventions
+- [.cursor/skills/explore-and-generate/SKILL.md](../skills/explore-and-generate/SKILL.md) — no-ticket coverage discovery; Gherkin plan for `test-writer` (read-only; do not write specs in this skill)
 - [.cursor/skills/pom-conventions/SKILL.md](../skills/pom-conventions/SKILL.md) — Page Object rules
 - [.cursor/skills/playwright-test-cleanup/SKILL.md](../skills/playwright-test-cleanup/SKILL.md) — fixture and cleanup
 - [.cursor/skills/ci-failure-triage/SKILL.md](../skills/ci-failure-triage/SKILL.md) — triage expectations (delegated to subagent)

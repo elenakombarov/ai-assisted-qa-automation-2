@@ -1,4 +1,5 @@
 import { test, unauthenticatedTest, expect, type Page, cacheCleanupAuthFromResponse } from '../fixtures/cleanup.fixture';
+import { EditProgramModal } from '../pages/EditProgramModal.js';
 
 const BASE_URL = (process.env.DIDAXIS_URL ?? 'https://test.didaxis.studio').replace(/\/$/, '');
 const LOGIN_URL = `${BASE_URL}/login`;
@@ -159,11 +160,7 @@ async function expectOverLengthBlockedOnSave(page: Page) {
 }
 
 async function closeEditViaX(page: Page) {
-  const modal = editModal(page);
-  await modal
-    .getByRole('button')
-    .filter({ hasNotText: /^(Save|Cancel|Show AI Generation Config)$/i })
-    .click();
+  await new EditProgramModal(page).closeViaX();
 }
 
 test.describe('DS-2: Edit Existing Program Details', () => {
