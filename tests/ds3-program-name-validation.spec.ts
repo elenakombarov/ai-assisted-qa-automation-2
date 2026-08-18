@@ -1,4 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
+import { type Locator } from '@playwright/test';
 import {
   test,
   expect,
@@ -51,6 +52,16 @@ async function captureProgramCreate(
     }
   }
   return undefined;
+}
+
+async function tabUntilFocused(page: Page, target: Locator, maxTabs = 30): Promise<void> {
+  for (let i = 0; i < maxTabs; i++) {
+    if (await target.evaluate((el) => el === document.activeElement)) {
+      return;
+    }
+    await page.keyboard.press('Tab');
+  }
+  throw new Error(`Could not reach focused target within ${maxTabs} Tab presses`);
 }
 
 async function openNewProgramForm(page: Page): Promise<ProgramsPage> {
@@ -461,6 +472,22 @@ test.describe('DS-3: Program name validation and duplicate prevention', () => {
   );
 
   test(
+    'DS-3-A11Y-002: Keyboard opens New Program dialog via Enter on focused control',
+    { tag: '@a11y' },
+    async ({ page }) => {
+      const programsPage = new ProgramsPage(page);
+
+      await programsPage.goto();
+      await expect(programsPage.heading).toBeVisible();
+
+      await tabUntilFocused(page, programsPage.newProgramButton);
+      await expect(programsPage.newProgramButton).toBeFocused();
+      await page.keyboard.press('Enter');
+      await expect(programsPage.newProgramModal.dialog).toBeVisible();
+    },
+  );
+
+  test(
     'DS-3-NET-001: Create handles POST 500 without crashing',
     { tag: '@network' },
     async ({ page }) => {
@@ -597,6 +624,94 @@ test.describe('DS-3: Program name validation and duplicate prevention', () => {
             status: 200,
             contentType: 'application/json',
             body: '{"unexpected":"shape"}',
+          });
+        }
+        return route.continue();
+      });
+
+      const programsPage = new ProgramsPage(page);
+      await programsPage.goto();
+
+      await expect(programsPage.heading).toBeVisible();
+    },
+  );
+
+  test(
+    'DS-3-NET-007: Programs page handles GET 401 without crashing',
+    { tag: '@network' },
+    async ({ page }) => {
+      await page.route('**/api/programs**', async (route) => {
+        if (route.request().method() === 'GET') {
+          return route.fulfill({
+            status: 401,
+            contentType: 'application/json',
+            body: JSON.stringify({ error: 'Unauthorized' }),
+          });
+        }
+        return route.continue();
+      });
+
+      const programsPage = new ProgramsPage(page);
+      await programsPage.goto();
+
+      await expect(programsPage.heading).toBeVisible();
+    },
+  );
+
+  test(
+    'DS-3-NET-008: Programs page handles GET 403 without crashing',
+    { tag: '@network' },
+    async ({ page }) => {
+      await page.route('**/api/programs**', async (route) => {
+        if (route.request().method() === 'GET') {
+          return route.fulfill({
+            status: 403,
+            contentType: 'application/json',
+            body: JSON.stringify({ error: 'Forbidden' }),
+          });
+        }
+        return route.continue();
+      });
+
+      const programsPage = new ProgramsPage(page);
+      await programsPage.goto();
+
+      await expect(programsPage.heading).toBeVisible();
+    },
+  );
+
+  test(
+    'DS-3-NET-009: Programs page handles GET 404 without crashing',
+    { tag: '@network' },
+    async ({ page }) => {
+      await page.route('**/api/programs**', async (route) => {
+        if (route.request().method() === 'GET') {
+          return route.fulfill({
+            status: 404,
+            contentType: 'application/json',
+            body: JSON.stringify({ error: 'Not Found' }),
+          });
+        }
+        return route.continue();
+      });
+
+      const programsPage = new ProgramsPage(page);
+      await programsPage.goto();
+
+      await expect(programsPage.heading).toBeVisible();
+    },
+  );
+
+  test(
+    'DS-3-NET-010: Programs page handles GET 302 without crashing',
+    { tag: '@network' },
+    async ({ page }) => {
+      await page.route('**/api/programs**', async (route) => {
+        if (route.request().method() === 'GET') {
+          return route.fulfill({
+            status: 302,
+            headers: { Location: '/login' },
+            body: '',
           });
         }
         return route.continue();
