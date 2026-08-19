@@ -13,7 +13,7 @@ export class ProgramsPage {
   constructor(page: Page) {
     this.page = page;
     this.heading = page.getByRole('heading', { name: 'Programs' });
-    this.newProgramButton = page.getByRole('button', { name: 'New Program' });
+    this.newProgramButton = page.getByRole('button', { name: 'Create Program' });
     this.newProgramModal = new NewProgramModal(page);
     this.deleteProgramModal = new DeleteProgramModal(page);
     this.emptyStateMessage = page.getByText('No programs yet. Create your first program to get started.');
