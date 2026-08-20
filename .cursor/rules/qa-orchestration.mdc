@@ -1,5 +1,5 @@
 ---
-description: "QA orchestration coordinator for DS/Jira tickets — analyze requirements, delegate test writing, run Playwright, triage failures, and file bugs. Use when the user asks to implement a Jira ticket end to end, run a DS ticket through the QA workflow, coordinate test writing/execution/triage/bug reporting, or handle a ticket from analysis through CI results."
+description: "QA orchestration coordinator for DS/Jira tickets — analyze requirements, delegate test writing, run Playwright, triage failures, heal-on-red locator drift, and file bugs. Use when the user asks to implement a Jira ticket end to end, run a DS ticket through the QA workflow, coordinate test writing/execution/triage/bug reporting, handle a ticket from analysis through CI results, or continue through a red CI run."
 alwaysApply: false
 ---
 
@@ -15,6 +15,7 @@ Activate when the user asks to:
 - run a DS ticket through the QA workflow
 - coordinate test writing, execution, triage, and bug reporting
 - handle a ticket from analysis through CI result
+- continue through a red CI run / heal-on-red (locator drift)
 
 ## Subagents (canonical definitions)
 
@@ -23,8 +24,9 @@ Activate when the user asks to:
 | Test creation | `test-writer` | [.cursor/agents/test-writer.md](../agents/test-writer.md) |
 | Failure diagnosis | `triage` | [.cursor/agents/triage.md](../agents/triage.md) |
 | Jira filing | `bug-reporter` | [.cursor/agents/bug-reporter.md](../agents/bug-reporter.md) |
+| Locator-drift heal | skill: `self-heal` | [.cursor/skills/self-heal/SKILL.md](../skills/self-heal/SKILL.md) |
 
-Delegate with `Task(subagent_type="<name>", ...)`. Pass structured context (ticket key, spec paths, run ID/URL, triage report). Do not reimplement subagent responsibilities in the parent session.
+Delegate with `Task(subagent_type="<name>", ...)`. Pass structured context (ticket key, spec paths, run ID/URL, triage report). For heal-on-red, apply the `self-heal` skill — it is not a subagent; do not improvise a locator fix outside that skill. Do not reimplement subagent responsibilities in the parent session.
 
 ## Coordinator workflow
 
@@ -54,14 +56,52 @@ Follow these steps in order. Do not skip steps or reorder gates.
 6. **If red:** **always** delegate diagnosis to `triage`.
    - Pass run URL/ID, spec path, failure output, and any local `ci-artifacts/` paths.
    - Never classify from the failed assertion alone; wait for the triage report.
+   - If classification is **Inconclusive:** **stop** and request human review. Do not heal. Do not file a bug. Skip to the routing trace.
 
 7. **If triage classifies Test issue:** propose the **minimal** test-side fix (spec, POM, fixture, or CI config). **Ask before applying.** Do not silently fix tests.
+   - **Locator drift:** do not use this ask-first path. Follow **Heal on red** below.
 
-8. **If triage classifies Application bug:** present the triage summary and **ask for human confirmation** before delegating to `bug-reporter`.
+8. **If triage classifies Application bug:** **do not heal.** Present the triage summary and **ask for human confirmation** before delegating to `bug-reporter`.
 
-9. **Delegate Jira filing** to `bug-reporter` **only after explicit approval** (e.g. "yes, file it", "create the Jira ticket").
+9. **Delegate Jira filing** to `bug-reporter` **only after explicit approval** (e.g. "yes, file it", "create the Jira ticket"). Apply [.cursor/skills/jira-bug-reporter/SKILL.md](../skills/jira-bug-reporter/SKILL.md) via that subagent.
 
-10. **Return a routing trace** (see template below) showing which subagent handled each step.
+10. **Return a routing trace** (see template below) showing which subagent (or skill) handled each step.
+
+## Heal on red
+
+On a **red run** (local or CI): **always delegate to `triage` first** (step 6). Do not heal, change locators, or file a bug before the triage report.
+
+| Classification | Action |
+|----------------|--------|
+| **Test issue — locator drift** | Apply the existing `self-heal` skill (below), then open a repair PR **linked to the run**. |
+| **Test issue — other** | Existing step 7: propose a minimal fix; ask before applying. Do **not** self-heal. |
+| **Application bug** | **Never heal a bug.** Delegate to `bug-reporter` (steps 8–9) to file and **link** the ticket to the run. |
+| **Inconclusive** | **Stop.** Request human review. Do not heal. Do not file. |
+
+Register and apply only [.cursor/skills/self-heal/SKILL.md](../skills/self-heal/SKILL.md). Pass the triage report, failing locator, POM/spec paths, and run ID/URL. Do not improvise a locator fix outside that skill. Do not create or edit the skill.
+
+**Self-heal (drift only):**
+
+1. **Re-discover** the element via the **Agent-Browser** (live role + accessible name).
+2. **Patch the POM** in `pages/` — one minimal locator repair per heal. Do not edit specs.
+3. **Re-run** the affected test to prove green. Assertions must be **unchanged**.
+4. If the three-check gate passes, **open a repair PR** linked to the failing run (ID/URL in the PR body). **Never merge** without a human.
+
+### Three-check heal gate
+
+A heal is accepted (and a repair PR may open) **only** when all three are true:
+
+1. The **affected re-run is green**.
+2. **Assertions are unchanged** (no assertion added, removed, commented, skipped, or weakened).
+3. **Triage classified the failure as drift** (test issue), **not** an application bug.
+
+If any check fails, **do not** open a PR. Never heal an assertion.
+
+### Budget / stop
+
+- **At most 5 heals per run.** Count each POM patch + affected re-run as one heal.
+- If a heal **will not prove green** (cannot rediscover the control, would require changing assertions, or the re-run stays red after the budget): **stop and escalate** to a human. Do not keep healing.
+- Existing coordinator stops still apply: green → stop; never skip triage; never merge without a human.
 
 ## Guardrails
 
@@ -70,15 +110,21 @@ Follow these steps in order. Do not skip steps or reorder gates.
 - **Never** skip triage for a red run (local or CI).
 - **Do not** silently fix tests, push changes, or merge without approval.
 - **Preserve** evidence paths, run IDs, spec paths, and Jira links in the final report.
+- **Never** heal a failure classified as an application bug, or an inconclusive result.
+- **Never** heal an assertion or weaken test coverage.
+- **At most 5 heals per run.** If a heal will not prove green, stop and escalate.
+- Heal on red (drift only) may patch a POM locator and open a repair PR **linked to the run** after the three-check gate. **Never merge** a repair without a human.
 - **Do not** modify unrelated files.
-- Parent coordinator runs tests; `test-writer` does not. `triage` and `bug-reporter` are read-only.
+- Parent coordinator runs tests; `test-writer` does not. `triage` and `bug-reporter` are read-only. `self-heal` may patch a POM locator and re-run the affected test; it must not edit assertions or specs.
 
 ## Skills reference (for analysis and review)
 
 - [.cursor/skills/didaxis-ds-qa/SKILL.md](../skills/didaxis-ds-qa/SKILL.md) — DS ticket layout and conventions
 - [.cursor/skills/pom-conventions/SKILL.md](../skills/pom-conventions/SKILL.md) — Page Object rules
 - [.cursor/skills/playwright-test-cleanup/SKILL.md](../skills/playwright-test-cleanup/SKILL.md) — fixture and cleanup
-- [.cursor/skills/ci-failure-triage/SKILL.md](../skills/ci-failure-triage/SKILL.md) — triage expectations (delegated to subagent)
+- [.cursor/skills/ci-failure-triage/SKILL.md](../skills/ci-failure-triage/SKILL.md) — triage expectations (delegated to `triage`)
+- [.cursor/skills/self-heal/SKILL.md](../skills/self-heal/SKILL.md) — Heal on red (drift only; Agent-Browser rediscovery; never assertions)
+- [.cursor/skills/jira-bug-reporter/SKILL.md](../skills/jira-bug-reporter/SKILL.md) — Jira filing (delegated to `bug-reporter`)
 
 ## Final report template
 
@@ -88,7 +134,7 @@ Always end with this routing trace:
 ## QA Orchestration Report
 
 **Ticket:** DS-N — <title>
-**Outcome:** <Success | Test issue (pending fix) | Application bug filed | Blocked>
+**Outcome:** <Success | Healed (PR opened) | Heal failed (re-triaged) | Test issue (pending fix) | Application bug filed | Inconclusive (human review) | Blocked>
 
 ### Routing trace
 | Step | Handler | Result |
@@ -98,7 +144,7 @@ Always end with this routing trace:
 | 3. Spec review | Coordinator | <approved / gaps noted> |
 | 4. Test execution | Coordinator | <pass \| fail — command run> |
 | 5–6. Diagnosis | triage | <classification or N/A if green> |
-| 7. Test fix proposal | Coordinator | <proposed fix or N/A> |
+| 7. Test fix / Heal on red | Coordinator or self-heal | <proposed fix \| POM repair + gate \| skipped (app bug / inconclusive) \| N/A> |
 | 8–9. Jira filing | bug-reporter | <DS-XXX URL or awaiting confirmation> |
 
 ### Artifacts
@@ -107,10 +153,11 @@ Always end with this routing trace:
 | Spec | `tests/<file>.spec.ts` |
 | Evidence / log | `ci-artifacts/run-<id>-failed.log` |
 | Playwright report | `ci-artifacts/run-<id>/` |
+| Heal PR | <URL or —> |
 | Jira | <URL or —> |
 
 ### Subagent reports
-<Paste or summarize test-writer, triage, and bug-reporter reports>
+<Paste or summarize test-writer, triage, self-heal, and bug-reporter reports>
 ```
 
 ## CI follow-up
@@ -118,5 +165,7 @@ Always end with this routing trace:
 When the user asks to continue through CI (or a PR check fails):
 
 1. Resolve the failed GitHub Actions run (`.github/workflows/e2e.yml`).
-2. Delegate to `triage` with run ID/URL — same gates as local failures.
-3. Do not file Jira until steps 8–9 are satisfied.
+2. Delegate to `triage` with run ID/URL — **always first**. Same gates as local failures. Never classify from the assertion alone.
+3. Route per **Heal on red**: drift → `self-heal` then repair PR linked to the run (three-check gate); application bug → do **not** heal, `bug-reporter` files and links (steps 8–9); inconclusive → stop for human review.
+4. Do not file Jira until steps 8–9 are satisfied.
+5. At most **5 heals per run**. If a heal will not prove green, **stop and escalate**. Never merge without a human.

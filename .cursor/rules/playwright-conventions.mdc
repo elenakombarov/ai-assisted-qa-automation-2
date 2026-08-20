@@ -8,6 +8,17 @@ alwaysApply: false
 
 Full standard for specs under `tests/**`. Prefer patterns already in this repo; where a section has no in-repo example yet, the ✅ block is **advised**.
 
+## Refusals (hard stops)
+
+If a request conflicts with any item below, **stop**. Do not comply, weaken the rule, or apply a workaround. State the conflict and what you need instead.
+
+- **Never weaken or delete an assertion to make a test pass.** Refuse. Report the failure; do not loosen, skip, comment out, or remove the check to go green.
+- **Never heal a failure that triage classified as a real bug.** Refuse. Do not change the spec, POM, or assertion to hide a product defect. Raise that the test is correct and the app must be fixed (or a bug filed).
+- **Never replace a role-based locator with CSS or XPath.** Refuse. Keep `getByRole` / `getByLabel` / `getByText`. If the locator fails, fix the accessible name, role, or `.filter` — do not drop to `page.locator` CSS/XPath.
+- **Never use `waitForTimeout`.** Refuse. Use web-first `expect(...)` waits. Raise the conflict if a sleep is proposed to "stabilize" a test.
+- **Never hardcode a credential.** Refuse. Tokens, passwords, and emails belong in env vars / `storageState`, never in specs, POMs, or fixtures.
+- **Never use the `any` type.** Refuse. Use a concrete type or `unknown` with narrowing.
+
 ## 1. Locators
 
 **Standard:** Role/label first; `getByTestId` escape hatch only (comment why); never CSS/XPath; disambiguate with `.filter({ hasText })`, not `.first()`.

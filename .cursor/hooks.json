@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": "node .cursor/hooks/enforce-generation-gate.mjs",
+        "failClosed": true
+      },
+      {
+        "command": "node .cursor/hooks/block-weakened-assertions.mjs",
+        "matcher": "tests/**",
+        "failClosed": true
+      }
+    ]
+  }
+}
