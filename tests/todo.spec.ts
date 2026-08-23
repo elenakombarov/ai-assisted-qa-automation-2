@@ -51,7 +51,7 @@ async function expectFooterHidden(page: Page) {
 }
 
 test.describe('TodoMVC — Add, Complete, and Delete', () => {
-  test('TC-001: Add a single todo item to the list', async ({ page }) => {
+  test('TC-001: Add a single todo item to the list', { tag: '@smoke' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
 
     const input = page.getByPlaceholder('What needs to be done?');
@@ -68,7 +68,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expect(page.getByRole('link', { name: 'Completed' })).toBeVisible();
   });
 
-  test('TC-002: Add multiple todo items sequentially', async ({ page }) => {
+  test('TC-002: Add multiple todo items sequentially', { tag: '@sanity' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
 
     await addTodo(page, 'Buy milk');
@@ -91,7 +91,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     }
   });
 
-  test('TC-003: Mark a todo item as complete', async ({ page }) => {
+  test('TC-003: Mark a todo item as complete', { tag: '@sanity' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
     await addTodo(page, 'Buy groceries');
 
@@ -103,7 +103,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expect(page.getByRole('button', { name: 'Clear completed' })).toBeVisible();
   });
 
-  test('TC-004: Delete a todo item from the list', async ({ page }) => {
+  test('TC-004: Delete a todo item from the list', { tag: '@sanity' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
     await addTodo(page, 'Task to delete');
     await expectCounter(page, 1);
@@ -115,7 +115,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expectFooterHidden(page);
   });
 
-  test('TC-005: Complete one item while others remain active', async ({ page }) => {
+  test('TC-005: Complete one item while others remain active', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
     await addTodo(page, 'Buy milk');
     await addTodo(page, 'Walk the dog');
@@ -133,7 +133,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expectCounter(page, 2);
   });
 
-  test('TC-006: Delete one item from a list of multiple todos', async ({ page }) => {
+  test('TC-006: Delete one item from a list of multiple todos', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
     await addTodo(page, 'Task 1');
     await addTodo(page, 'Task 2');
@@ -148,7 +148,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expectCounter(page, 2);
   });
 
-  test('TC-007: Delete a completed todo item', async ({ page }) => {
+  test('TC-007: Delete a completed todo item', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
     await addTodo(page, 'Done task');
     await toggleTodo(page, 'Done task');
@@ -163,7 +163,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expect(page.getByRole('button', { name: 'Clear completed' })).not.toBeVisible();
   });
 
-  test('TC-008: Empty todo is not added when pressing Enter', async ({ page }) => {
+  test('TC-008: Empty todo is not added when pressing Enter', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
 
     const input = page.getByPlaceholder('What needs to be done?');
@@ -175,7 +175,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expect(input).toBeEmpty();
   });
 
-  test('TC-009: Whitespace-only input is not added as a todo', async ({ page }) => {
+  test('TC-009: Whitespace-only input is not added as a todo', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
 
     const input = page.getByPlaceholder('What needs to be done?');
@@ -186,7 +186,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expectFooterHidden(page);
   });
 
-  test('TC-010: Whitespace-only submission does not affect existing todos', async ({ page }) => {
+  test('TC-010: Whitespace-only submission does not affect existing todos', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
     await addTodo(page, 'Buy groceries');
     await expectCounter(page, 1);
@@ -200,7 +200,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expectCounter(page, 1);
   });
 
-  test('TC-011: Delete button is not available when list is empty', async ({ page }) => {
+  test('TC-011: Delete button is not available when list is empty', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
 
     await expectTodoCount(page, 0);
@@ -208,7 +208,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expectFooterHidden(page);
   });
 
-  test('TC-012: Completing a todo does not remove it from the All view', async ({ page }) => {
+  test('TC-012: Completing a todo does not remove it from the All view', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
     await addTodo(page, 'Buy groceries');
     await expect(page.getByRole('link', { name: 'All' })).toBeVisible();
@@ -219,7 +219,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expect(todoItem(page, 'Buy groceries').getByRole('checkbox', { name: 'Toggle Todo' })).toBeChecked();
   });
 
-  test('TC-013: Trim leading and trailing whitespace when adding a todo', async ({ page }) => {
+  test('TC-013: Trim leading and trailing whitespace when adding a todo', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
 
     await addTodo(page, '  Todo with spaces  ');
@@ -229,7 +229,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expectCounter(page, 1);
   });
 
-  test('TC-014: Todo text with special characters is stored and displayed', async ({ page }) => {
+  test('TC-014: Todo text with special characters is stored and displayed', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
     const text = 'Pay rent — $1,200 (due 6/30)';
 
@@ -239,7 +239,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expect(page.getByText(text)).toBeVisible();
   });
 
-  test('TC-015: Todo text with Unicode and emoji is stored and displayed', async ({ page }) => {
+  test('TC-015: Todo text with Unicode and emoji is stored and displayed', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
     const text = '買い物 🛒';
 
@@ -254,7 +254,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expect(page.getByText(text)).toBeVisible();
   });
 
-  test('TC-016: Add two todos with identical text', async ({ page }) => {
+  test('TC-016: Add two todos with identical text', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
 
     await addTodo(page, 'Buy milk');
@@ -265,7 +265,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expect(todoItems(page).filter({ hasText: 'Buy milk' }).getByRole('checkbox', { name: 'Toggle Todo' })).toHaveCount(2);
   });
 
-  test('TC-017: Very long todo text (500 characters) is accepted and displayed', async ({ page }) => {
+  test('TC-017: Very long todo text (500 characters) is accepted and displayed', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
     const longText = 'A'.repeat(500);
 
@@ -282,7 +282,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expectFooterHidden(page);
   });
 
-  test('TC-018: Rapid double Enter does not duplicate the same todo', async ({ page }) => {
+  test('TC-018: Rapid double Enter does not duplicate the same todo', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
 
     const input = page.getByPlaceholder('What needs to be done?');
@@ -295,7 +295,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expect(input).toBeEmpty();
   });
 
-  test('TC-019: Uncomplete a previously completed todo', async ({ page }) => {
+  test('TC-019: Uncomplete a previously completed todo', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
     await addTodo(page, 'Buy groceries');
     await toggleTodo(page, 'Buy groceries');
@@ -310,7 +310,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expect(page.getByRole('button', { name: 'Clear completed' })).not.toBeVisible();
   });
 
-  test('TC-020: Counter updates correctly when adding, completing, and deleting', async ({ page }) => {
+  test('TC-020: Counter updates correctly when adding, completing, and deleting', { tag: '@sanity' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
 
     await addTodo(page, 'Buy milk');
@@ -328,7 +328,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expect(todoItem(page, 'Buy milk').getByRole('checkbox', { name: 'Toggle Todo' })).toBeChecked();
   });
 
-  test('TC-021: Footer is hidden when the list is empty', async ({ page }) => {
+  test('TC-021: Footer is hidden when the list is empty', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
     await expectFooterHidden(page);
 
@@ -342,7 +342,7 @@ test.describe('TodoMVC — Add, Complete, and Delete', () => {
     await expectFooterHidden(page);
   });
 
-  test('TC-022: Todos persist in localStorage after page reload', async ({ page }) => {
+  test('TC-022: Todos persist in localStorage after page reload', { tag: '@regression' }, async ({ page }) => {
     await gotoEmptyTodoPage(page);
     await addTodo(page, 'Persistent 1');
     await addTodo(page, 'Persistent 2');

@@ -100,10 +100,28 @@ test.beforeEach(async ({ page }) => {
 
 ## 5. Test data
 
-**Standard:** Unique data with `uniqueName()` / `Date.now()`; every test cleans up after itself via `trackProgram`.
+**Standard:** Happy-path records come from Faker factories under `test-data/factories`. Curated invalid inputs live in static `.ts` files (not Faker). Secrets and URLs come from `process.env`. Repeated paths and UI/API messages come from enums. Every created program still uses `uniqueName()` / `Date.now()` plus `trackProgram`.
 
 ```typescript
-// ✅ Good — from tests/ds1-create-program.spec.ts + cleanup fixture
+// ✅ Good — advised factory under test-data/factories/program.ts
+import { faker } from "@faker-js/faker";
+
+export function programFactory(
+  overrides: Partial<{ name: string; description: string }> = {},
+) {
+  return {
+    name: `${faker.commerce.productName()} ${Date.now()}`,
+    description: faker.lorem.sentence(),
+    ...overrides,
+  };
+}
+
+const program = programFactory();
+await programsPage.createProgram(program.name, trackProgram, program.description);
+```
+
+```typescript
+// ✅ Good — uniqueName + cleanup fixture (current specs)
 const programName = uniqueName("Web Development 2026");
 await programsPage.createProgram(programName, trackProgram, description);
 ```
@@ -111,10 +129,11 @@ await programsPage.createProgram(programName, trackProgram, description);
 ```typescript
 // ❌ Bad
 const programName = "Web Development 2026"; // shared, collisions
-// create program and leave it in the environment
+const token = "eyJhbGciOi..."; // hardcoded secret
+await expect(page.getByText("Service Unavailable!!!")).toBeVisible(); // invented copy
 ```
 
-**Why:** Prevents cross-test collisions and polluted Didaxis data that makes later runs fail for unrelated reasons.
+**Why:** Prevents collisions, leaked secrets, and invented strings. Do not invent product copy or field values the app does not use.
 
 ## 6. API testing
 
@@ -231,6 +250,37 @@ let sharedProgramName = ""; // mutable state across tests
 
 **Why:** Prevents hidden flake, serial bottlenecks, and date/time assertions that pass locally and fail in CI. *(Pin `locale` + `timezoneId` in config once chosen — not set yet.)*
 
+## 11. Tags
+
+**Standard:** Exactly one tag on `test()` / `unauthenticatedTest()`: `@smoke`, `@sanity`, `@regression`, `@api`, `@e2e`, or `@destructive`. Never tag `test.describe()`.
+
+| Tag | Use |
+|-----|-----|
+| `@smoke` | Smallest critical happy path |
+| `@sanity` | Additional core happy paths |
+| `@regression` | Validation, boundaries, a11y, known-defect skips |
+| `@api` | Playwright `request` contract checks |
+| `@e2e` | Auth / role / unauthenticated journeys |
+| `@destructive` | **Only** tests that mutate shared/global state (locale, roles, flags, settings). Run serially (`npm run test:destructive` uses `--workers=1`). |
+
+A test that creates and deletes **only its own** data keeps `@smoke` / `@sanity` / `@regression` / `@e2e` / `@api` — not `@destructive`. Cleanup stays on `trackProgram` + the fixture.
+
+Any test that mutates shared/global state must revert it in `afterEach` / `afterAll`. Do not add those hooks for program create/delete — the cleanup fixture already tears those records down.
+
+```typescript
+// ✅ Good
+test("DS-1-TC-002: Successfully create a program with valid data", { tag: "@smoke" }, async ({ page, trackProgram }) => {
+```
+
+```typescript
+// ❌ Bad
+test.describe("DS-1: Create New Academic Program", { tag: "@smoke" }, () => {});
+test("creates a program", { tag: ["@smoke", "@e2e"] }, async ({ page }) => {});
+test("changes locale", { tag: "@smoke" }, async ({ page }) => {}); // shared state → @destructive + revert hook
+```
+
+**Why:** Keeps slices (`npm run test:smoke`, `test:destructive`, …) disjoint and prevents parallel tests from clobbering org-wide settings.
+
 ---
 
 ## Do / Don't
@@ -241,7 +291,8 @@ let sharedProgramName = ""; // mutable state across tests
 | Wait with `expect(locator).toBeVisible()` | Use `waitForTimeout` or `expect(await isVisible())` |
 | Put locators and actions in POMs | Inline locators or `expect` inside POMs |
 | Rely on setup `storageState` | UI-login before every feature test |
-| `uniqueName()` + `trackProgram` | Fixed names or leave programs behind |
+| `uniqueName()` + `trackProgram`; factories for happy-path | Fixed names or leave programs behind |
+| Exactly one of `@smoke` `@sanity` `@regression` `@api` `@e2e` `@destructive` on `test()` | Tags on `test.describe()`, multiple tags, or `@destructive` on self-cleaning data |
 | Prefer `request` for API/contract checks | Hardcode tokens or delete foreign data |
 | Narrow `page.route` + observed UI copy | Mock the endpoint under test or invent strings |
 | Axe `wcag2a`/`wcag2aa` + keyboard check | `.disableRules()` to go green |

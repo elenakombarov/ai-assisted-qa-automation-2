@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": "node .cursor/hooks/block-wont-violations.mjs",
+        "matcher": "Write",
+        "failClosed": true
+      }
+    ],
+    "stop": [
+      {
+        "command": "node .cursor/hooks/regenerate-eval-report.mjs",
+        "failClosed": false,
+        "timeout": 120
+      }
+    ],
+    "subagentStop": [
+      {
+        "command": "node .cursor/hooks/regenerate-eval-report.mjs",
+        "matcher": "test-writer|triage|bug-reporter",
+        "failClosed": false,
+        "timeout": 120
+      }
+    ],
+    "afterShellExecution": [
+      {
+        "command": "node .cursor/hooks/regenerate-eval-report.mjs",
+        "matcher": "test-generation",
+        "failClosed": false,
+        "timeout": 120
+      }
+    ]
+  }
+}

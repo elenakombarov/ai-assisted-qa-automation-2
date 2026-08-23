@@ -63,6 +63,12 @@ Follow these steps in order. Do not skip steps or reorder gates.
 
 10. **Return a routing trace** (see template below) showing which subagent handled each step.
 
+11. **Regenerate** [`eval-report.md`](../../eval-report.md) by running:
+    ```bash
+    node .cursor/hooks/regenerate-eval-report.mjs
+    ```
+    Then fill Heal / Generation-gate / Ask-vs-guess from this session only. Do not invent metrics; mark gaps unavailable. This step is mandatory after local orchestration. The same script also runs from Cursor `stop` / `subagentStop` hooks and from `afterShellExecution` when the command matches `test-generation`. If `.github/workflows/test-generation.yml` is added later, its last step must be this same command — do not add a second workflow.
+
 ## Guardrails
 
 - **Never** file a Jira bug without human confirmation.
@@ -108,6 +114,7 @@ Always end with this routing trace:
 | Evidence / log | `ci-artifacts/run-<id>-failed.log` |
 | Playwright report | `ci-artifacts/run-<id>/` |
 | Jira | <URL or —> |
+| Reliability | `eval-report.md` |
 
 ### Subagent reports
 <Paste or summarize test-writer, triage, and bug-reporter reports>
@@ -117,6 +124,7 @@ Always end with this routing trace:
 
 When the user asks to continue through CI (or a PR check fails):
 
-1. Resolve the failed GitHub Actions run (`.github/workflows/e2e.yml`).
+1. Resolve the failed GitHub Actions run (`.github/workflows/e2e.yml` or `.github/workflows/test-generation.yml` when that workflow exists).
 2. Delegate to `triage` with run ID/URL — same gates as local failures.
 3. Do not file Jira until steps 8–9 are satisfied.
+4. Run `node .cursor/hooks/regenerate-eval-report.mjs` (same script as step 11 and the Cursor hooks).

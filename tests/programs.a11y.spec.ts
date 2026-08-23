@@ -94,7 +94,7 @@ test.describe('Programs accessibility', () => {
     },
   );
 
-  test('New Program modal has no accessibility violations', async ({ page }, testInfo) => {
+  test('New Program modal has no accessibility violations', { tag: '@regression' }, async ({ page }, testInfo) => {
     const programsPage = new ProgramsPage(page);
 
     await programsPage.goto();

@@ -1,0 +1,54 @@
+---
+description: Always-on constitution for Playwright tests — MUST / SHOULD / WON'T plus skill and agent index
+alwaysApply: true
+---
+
+# Constitution
+
+Hard constraints for this Playwright project. Prefer existing repo patterns.
+
+| MUST | |
+|------|--|
+| Role-based locators | `getByRole` / `getByLabel` / `getByText`; `.filter({ hasText })`, not `.first()` |
+| Web-first assertions | `expect(locator).toBeVisible()` (and peers); never snapshot `isVisible()` |
+| `storageState` auth | Setup project session for feature tests |
+| Unique self-cleaning data | `uniqueName()` / `Date.now()` + `trackProgram` |
+| One tag per test | Exactly one of `@smoke` `@sanity` `@regression` `@api` `@e2e` `@destructive` on `test()`, never on `test.describe` |
+
+| SHOULD | |
+|--------|--|
+| Faker factories | Generate test data via factories, not literals |
+| Enums | Typed constants for repeated UI/API strings |
+| JSDoc | Document POM action methods |
+
+| WON'T | |
+|-------|--|
+| XPath / CSS locators | Refuse; keep role/name/filter |
+| `waitForTimeout` | Refuse; web-first waits only |
+| Hardcoded secrets | Env / `storageState` only |
+| `any` | Concrete type or `unknown` |
+| Weakened assertions | Never skip, comment out, or delete a check to go green |
+| Healing a real app bug | Never change the test to hide a product defect |
+| Tags on `test.describe` | Tags belong on individual tests |
+
+## Agent governance
+
+Audit the relevant files, rules, skills, agents, workflows, and existing patterns before proposing. Prefer existing paths and conventions.
+
+Before any non-trivial edit, emit:
+
+```
+Proposal
+- Scope:
+- Confidence: 1-10
+- Rationale:
+- Unknowns:
+```
+
+- Confidence **< 5**: do not proceed; ask for the missing input.
+- Confidence **5–7**: proceed only after listing unknowns and receiving human approval.
+- Confidence **≥ 8**: proceed.
+
+Never invent a path, enum, env var, credential, message, selector, or project-specific value. If unknown, ask or explore. Behavioral only — no hooks for this gate.
+
+**Index:** skills `.cursor/skills/{a11y-checks,ci-failure-triage,didaxis-bulk-cleanup,didaxis-ds-qa,exploratory-charter,jira-bug-reporter,jira-ticket-to-gherkin,network-mocked-edge-cases,playwright-test-cleanup,pom-conventions}/SKILL.md` · agents `.cursor/agents/{test-writer,triage,bug-reporter}.md`

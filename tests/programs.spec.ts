@@ -48,7 +48,7 @@ async function expectOverLengthBlocked(modal: NewProgramModal) {
 }
 
 test.describe('DS-1: Create New Academic Program', () => {
-  test('DS-1-TC-001: Navigate to program creation form as admin', async ({ page }) => {
+  test('DS-1-TC-001: Navigate to program creation form as admin', { tag: '@sanity' }, async ({ page }) => {
     const programsPage = new ProgramsPage(page);
 
     await programsPage.goto();
@@ -58,7 +58,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.newProgramModal.descriptionInput).toBeVisible();
   });
 
-  test('DS-1-TC-002: Successfully create a program with valid data', async ({ page, trackProgram }) => {
+  test('DS-1-TC-002: Successfully create a program with valid data', { tag: '@smoke' }, async ({ page, trackProgram }) => {
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName('Web Development 2026');
 
@@ -71,7 +71,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.programNameInList(programName)).toBeVisible();
   });
 
-  test('DS-1-TC-003: Create button disabled when Program Name is empty', async ({ page }) => {
+  test('DS-1-TC-003: Create button disabled when Program Name is empty', { tag: '@regression' }, async ({ page }) => {
     const programsPage = new ProgramsPage(page);
 
     await programsPage.goto();
@@ -80,7 +80,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.newProgramModal.createButton).toBeDisabled();
   });
 
-  test('DS-1-TC-004: Create program with name and description', async ({ page, trackProgram }) => {
+  test('DS-1-TC-004: Create program with name and description', { tag: '@sanity' }, async ({ page, trackProgram }) => {
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName('Data Science Fundamentals');
 
@@ -93,7 +93,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.programNameInList(programName)).toBeVisible();
   });
 
-  test('DS-1-TC-005: Create program with empty description', async ({ page, trackProgram }) => {
+  test('DS-1-TC-005: Create program with empty description', { tag: '@sanity' }, async ({ page, trackProgram }) => {
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName('Cybersecurity Basics');
 
@@ -106,7 +106,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.programNameInList(programName)).toBeVisible();
   });
 
-  test('DS-1-TC-006: Cancel program creation without saving', async ({ page }) => {
+  test('DS-1-TC-006: Cancel program creation without saving', { tag: '@regression' }, async ({ page }) => {
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName('Temporary Program');
 
@@ -119,7 +119,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.programNameInList(programName)).not.toBeVisible();
   });
 
-  test('DS-1-TC-007: Non-admin user cannot access program creation', async ({ page }) => {
+  test('DS-1-TC-007: Non-admin user cannot access program creation', { tag: '@e2e' }, async ({ page }) => {
     test.skip(
       !process.env.DIDAXIS_NON_ADMIN_EMAIL || !process.env.DIDAXIS_NON_ADMIN_PASSWORD,
       'Requires DIDAXIS_NON_ADMIN_EMAIL and DIDAXIS_NON_ADMIN_PASSWORD environment variables',
@@ -135,7 +135,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.newProgramButton).not.toBeVisible();
   });
 
-  unauthenticatedTest('DS-1-TC-008: Unauthenticated user redirected from Programs page', async ({ page }) => {
+  unauthenticatedTest('DS-1-TC-008: Unauthenticated user redirected from Programs page', { tag: '@e2e' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const programsPage = new ProgramsPage(page);
 
@@ -145,7 +145,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(loginPage.passwordInput).toBeVisible();
   });
 
-  test('DS-1-TC-009: Duplicate program name rejected', async ({ page, trackProgram }) => {
+  test('DS-1-TC-009: Duplicate program name rejected', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName('Web Development 2026');
 
@@ -160,7 +160,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.programNameInList(programName)).toHaveCount(1);
   });
 
-  test('DS-1-TC-010: Program name with leading and trailing whitespace trimmed', async ({ page, trackProgram }) => {
+  test('DS-1-TC-010: Program name with leading and trailing whitespace trimmed', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName('Web Development 2026');
     const paddedName = `  ${programName}  `;
@@ -174,7 +174,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.programNameInList(programName)).toBeVisible();
   });
 
-  test('DS-1-TC-011: Program name with special characters accepted', async ({ page, trackProgram }) => {
+  test('DS-1-TC-011: Program name with special characters accepted', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName('C++ & C# — Advanced (2026)');
 
@@ -187,7 +187,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.programNameInList(programName)).toBeVisible();
   });
 
-  test('DS-1-TC-012: Description with special characters and line breaks', async ({ page, trackProgram }) => {
+  test('DS-1-TC-012: Description with special characters and line breaks', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName('Multiline Description Test');
     const description = 'Line 1: HTML <tags> & symbols\nLine 2: "quoted" text';
@@ -201,7 +201,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.programNameInList(programName)).toBeVisible();
   });
 
-  test('DS-1-TC-013: Program name at minimum length boundary (1 character)', async ({ page, trackProgram }) => {
+  test('DS-1-TC-013: Program name at minimum length boundary (1 character)', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programsPage = new ProgramsPage(page);
     const programName = `${Date.now() % 10}`;
 
@@ -215,7 +215,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.programNameInList(programName)).toBeVisible();
   });
 
-  test('DS-1-TC-014: Program name at maximum length boundary', async ({ page, trackProgram }) => {
+  test('DS-1-TC-014: Program name at maximum length boundary', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programsPage = new ProgramsPage(page);
     const programName = `${'A'.repeat(MAX_NAME_LENGTH - 13)} ${Date.now()}`.slice(0, MAX_NAME_LENGTH);
 
@@ -228,7 +228,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.programNameInList(programName)).toBeVisible();
   });
 
-  test('DS-1-TC-015: Program name exceeding maximum length rejected', async ({ page }) => {
+  test('DS-1-TC-015: Program name exceeding maximum length rejected', { tag: '@regression' }, async ({ page }) => {
     const programsPage = new ProgramsPage(page);
     const overMaxName = `${'B'.repeat(MAX_NAME_LENGTH)}${Date.now()}`;
 
@@ -238,7 +238,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expectOverLengthBlocked(programsPage.newProgramModal);
   });
 
-  test('DS-1-TC-016: Description at maximum length boundary', async ({ page, trackProgram }) => {
+  test('DS-1-TC-016: Description at maximum length boundary', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName('Max Description Boundary');
 
@@ -251,7 +251,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.programNameInList(programName)).toBeVisible();
   });
 
-  test('DS-1-TC-017: Description exceeding maximum length rejected', async ({ page }) => {
+  test('DS-1-TC-017: Description exceeding maximum length rejected', { tag: '@regression' }, async ({ page }) => {
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName('Over Max Description');
 
@@ -261,7 +261,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expectOverLengthBlocked(programsPage.newProgramModal);
   });
 
-  test('DS-1-TC-018: Program name with only whitespace treated as empty', async ({ page }) => {
+  test('DS-1-TC-018: Program name with only whitespace treated as empty', { tag: '@regression' }, async ({ page }) => {
     const programsPage = new ProgramsPage(page);
 
     await programsPage.goto();
@@ -270,7 +270,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.newProgramModal.createButton).toBeDisabled();
   });
 
-  test('DS-1-TC-019: Create button re-enabled after clearing invalid name', async ({ page }) => {
+  test('DS-1-TC-019: Create button re-enabled after clearing invalid name', { tag: '@regression' }, async ({ page }) => {
     const programsPage = new ProgramsPage(page);
 
     await programsPage.goto();
@@ -283,7 +283,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.newProgramModal.createButton).toBeDisabled();
   });
 
-  test('DS-1-TC-020: New program appears in list without page refresh', async ({ page, trackProgram }) => {
+  test('DS-1-TC-020: New program appears in list without page refresh', { tag: '@sanity' }, async ({ page, trackProgram }) => {
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName('No Refresh Test Program');
 
@@ -297,7 +297,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(page).toHaveURL(/\/programs/);
   });
 
-  test('DS-1-TC-021: Program name case sensitivity for duplicates', async ({ page, trackProgram }) => {
+  test('DS-1-TC-021: Program name case sensitivity for duplicates', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName('Web Development 2026');
 
@@ -310,7 +310,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.programNameInList(programName)).toHaveCount(1);
   });
 
-  test('DS-1-TC-022: SQL injection and XSS strings handled safely', async ({ page, trackProgram }) => {
+  test('DS-1-TC-022: SQL injection and XSS strings handled safely', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName("<script>alert('xss')</script>");
     const description = "'; DROP TABLE programs; --";
@@ -331,7 +331,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.programNameInList(programName)).toBeVisible();
   });
 
-  test('DS-1-TC-023: Unicode and emoji characters in program name', async ({ page, trackProgram }) => {
+  test('DS-1-TC-023: Unicode and emoji characters in program name', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName('プログラム 🎓 2026');
 
@@ -344,7 +344,7 @@ test.describe('DS-1: Create New Academic Program', () => {
     await expect(programsPage.programNameInList(programName)).toBeVisible();
   });
 
-  test('DS-1-TC-024: Rapid double-click on Create does not duplicate program', async ({ page, trackProgram }) => {
+  test('DS-1-TC-024: Rapid double-click on Create does not duplicate program', { tag: '@regression' }, async ({ page, trackProgram }) => {
     test.skip(true, 'Known app defect: double-click Create submits twice and creates duplicate programs');
     const programsPage = new ProgramsPage(page);
     const programName = uniqueName('Double Click Test');
