@@ -101,7 +101,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramNotInList(page, programName);
   });
 
-  test('DS-4-TC-002: Cancel program deletion', { tag: '@sanity' }, async ({ page, trackProgram }) => {
+  test('DS-4-TC-002: Cancel program deletion', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programName = uniqueName('Test Program');
 
     await createProgram(page, programName, trackProgram);
@@ -113,7 +113,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramInList(page, programName);
   });
 
-  test('DS-4-TC-003: Program list updates without page refresh after delete', { tag: '@sanity' }, async ({ page }) => {
+  test('DS-4-TC-003: Program list updates without page refresh after delete', { tag: '@regression' }, async ({ page }) => {
     const programName = uniqueName('No Refresh Delete Test');
 
     await createProgram(page, programName);
@@ -154,7 +154,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramNotInList(page, programName);
   });
 
-  test('DS-4-TC-007: Confirmation dialog displays program name', { tag: '@sanity' }, async ({ page, trackProgram }) => {
+  test('DS-4-TC-007: Confirmation dialog displays program name', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programName = uniqueName('Test Program');
 
     await createProgram(page, programName, trackProgram);
@@ -266,7 +266,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramNotInList(page, programName);
   });
 
-  test('DS-4-TC-016: Delete one program when multiple programs exist', { tag: '@sanity' }, async ({ page, trackProgram }) => {
+  test('DS-4-TC-016: Delete one program when multiple programs exist', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programA = uniqueName('Program A');
     const programB = uniqueName('Program B');
     const programC = uniqueName('Program C');
@@ -330,7 +330,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramNotInList(page, programName);
   });
 
-  test('DS-4-TC-021: Confirm deletion via keyboard', { tag: '@sanity' }, async ({ page }) => {
+  test('DS-4-TC-021: Confirm deletion via keyboard', { tag: '@regression' }, async ({ page }) => {
     const programName = uniqueName('Keyboard Delete Test');
 
     await createProgram(page, programName);
