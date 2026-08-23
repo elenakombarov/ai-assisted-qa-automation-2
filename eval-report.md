@@ -15,16 +15,16 @@ Cursor has no built-in telemetry for these metrics. Numbers below come only from
 
 | Run | When | Footer |
 |-----|------|--------|
+| [32671442698](https://github.com/elenakombarov/ai-assisted-qa-automation-2/actions/runs/32671442698) | 2026-08-23 | no summary footer in log |
+| [32671440293](https://github.com/elenakombarov/ai-assisted-qa-automation-2/actions/runs/32671440293) | 2026-08-23 | no summary footer in log |
+| [32670313956](https://github.com/elenakombarov/ai-assisted-qa-automation-2/actions/runs/32670313956) | 2026-08-23 | no summary footer in log |
+| [32670181380](https://github.com/elenakombarov/ai-assisted-qa-automation-2/actions/runs/32670181380) | 2026-08-23 | no summary footer in log |
 | [32412935091](https://github.com/elenakombarov/ai-assisted-qa-automation-2/actions/runs/32412935091) | 2026-08-20 | no summary footer in log |
 | [32407043270](https://github.com/elenakombarov/ai-assisted-qa-automation-2/actions/runs/32407043270) | 2026-08-20 | no summary footer in log |
 | [32301732604](https://github.com/elenakombarov/ai-assisted-qa-automation-2/actions/runs/32301732604) | 2026-08-19 | no summary footer in log |
 | [32193897013](https://github.com/elenakombarov/ai-assisted-qa-automation-2/actions/runs/32193897013) | 2026-08-18 | no summary footer in log |
 | [32182662435](https://github.com/elenakombarov/ai-assisted-qa-automation-2/actions/runs/32182662435) | 2026-08-18 | no summary footer in log |
 | [32181806660](https://github.com/elenakombarov/ai-assisted-qa-automation-2/actions/runs/32181806660) | 2026-08-18 | no summary footer in log |
-| [32174588410](https://github.com/elenakombarov/ai-assisted-qa-automation-2/actions/runs/32174588410) | 2026-08-18 | no summary footer in log |
-| [32173748281](https://github.com/elenakombarov/ai-assisted-qa-automation-2/actions/runs/32173748281) | 2026-08-18 | no summary footer in log |
-| [32099494445](https://github.com/elenakombarov/ai-assisted-qa-automation-2/actions/runs/32099494445) | 2026-08-18 | no summary footer in log |
-| [32091336419](https://github.com/elenakombarov/ai-assisted-qa-automation-2/actions/runs/32091336419) | 2026-08-18 | no summary footer in log |
 
 **How measured:** `gh run list` then `gh run view <id> --log` and the Playwright footer (`N flaky` = failed then passed on retry; `retries: 2` on CI). Denominator is failed + passed + flaky (skipped excluded). Run `32181806660` recovered from the HTML `playwright-report` artifact (`stats`: unexpected 25, expected 106, flaky 0). All three retry-pass executions are **DS-1-TC-013: Program name at minimum length boundary (1 character)** in runs `32173748281` (`ds1-create-program.spec.ts`), `32099494445` (`programs.spec.ts`), and `32091336419` (`programs.spec.ts`).
 
