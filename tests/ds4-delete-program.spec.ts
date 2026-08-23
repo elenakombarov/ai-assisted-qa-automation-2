@@ -90,7 +90,7 @@ async function cancelDelete(page: Page): Promise<void> {
 test.describe('DS-4: Delete Program with Confirmation', () => {
   test.describe.configure({ timeout: 60_000 });
 
-  test('DS-4-TC-001: Delete program with confirmation', { tag: '@smoke' }, async ({ page }) => {
+  test('DS-4-TC-001: Delete program with confirmation', { tag: '@regression' }, async ({ page }) => {
     const programName = uniqueName('Test Program');
 
     await createProgram(page, programName);
