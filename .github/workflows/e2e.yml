@@ -1,10 +1,9 @@
 name: E2E Tests
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
+  push:
+  workflow_dispatch:
 
 jobs:
   test:
@@ -27,7 +26,17 @@ jobs:
 
       - run: npx playwright install --with-deps chromium
 
-      - run: npx playwright test
+      - name: Smoke tests
+        if: github.event_name == 'pull_request'
+        run: npm run test:smoke
+
+      - name: Sanity tests
+        if: github.event_name == 'push'
+        run: npm run test:sanity
+
+      - name: Regression tests
+        if: github.event_name == 'workflow_dispatch'
+        run: npm run test:regression
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

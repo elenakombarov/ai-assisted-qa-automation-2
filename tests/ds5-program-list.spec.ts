@@ -74,7 +74,7 @@ async function expectProgramWithDescription(
 test.describe('DS-5: Program List Filtering and Display', () => {
   test.describe.configure({ timeout: 60_000 });
 
-  test('DS-5-TC-001: Display program list with name and description', async ({ page, trackProgram }) => {
+  test('DS-5-TC-001: Display program list with name and description', { tag: '@smoke' }, async ({ page, trackProgram }) => {
     const programName = uniqueName('Web Development 2026');
     const description = 'Full-stack web development program';
 
@@ -86,7 +86,7 @@ test.describe('DS-5: Program List Filtering and Display', () => {
     await expect.soft(programsPage.programRow(programName)).toContainText(description);
   });
 
-  test('DS-5-TC-003: Display multiple programs in list', async ({ page, trackProgram }) => {
+  test('DS-5-TC-003: Display multiple programs in list', { tag: '@sanity' }, async ({ page, trackProgram }) => {
     const programA = uniqueName('Web Development 2026');
     const programB = uniqueName('Data Science Fundamentals');
     const programC = uniqueName('Cybersecurity Basics');
@@ -106,7 +106,7 @@ test.describe('DS-5: Program List Filtering and Display', () => {
     await expectProgramWithDescription(programsPage, programC, descriptionC);
   });
 
-  test('DS-5-TC-004: Program with empty description still appears in list', async ({ page, trackProgram }) => {
+  test('DS-5-TC-004: Program with empty description still appears in list', { tag: '@sanity' }, async ({ page, trackProgram }) => {
     const programName = uniqueName('No Description Program');
 
     const programsPage = await createProgram(page, programName, trackProgram, '');
@@ -116,7 +116,7 @@ test.describe('DS-5: Program List Filtering and Display', () => {
     await expect(programsPage.programRow(programName)).toBeVisible();
   });
 
-  test('DS-5-TC-005: List shows newly created program without reload', async ({ page, trackProgram }) => {
+  test('DS-5-TC-005: List shows newly created program without reload', { tag: '@sanity' }, async ({ page, trackProgram }) => {
     const programName = uniqueName('New List Entry Program');
     const description = 'Verify list updates in place after creation';
     const programsPage = new ProgramsPage(page);
@@ -131,7 +131,7 @@ test.describe('DS-5: Program List Filtering and Display', () => {
     await expect(page).toHaveURL(/\/programs/);
   });
 
-  unauthenticatedTest('DS-5-TC-010: Unauthenticated user cannot access Programs page', async ({ page }) => {
+  unauthenticatedTest('DS-5-TC-010: Unauthenticated user cannot access Programs page', { tag: '@e2e' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const programsPage = new ProgramsPage(page);
 

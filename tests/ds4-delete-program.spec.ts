@@ -90,7 +90,7 @@ async function cancelDelete(page: Page): Promise<void> {
 test.describe('DS-4: Delete Program with Confirmation', () => {
   test.describe.configure({ timeout: 60_000 });
 
-  test('DS-4-TC-001: Delete program with confirmation', async ({ page }) => {
+  test('DS-4-TC-001: Delete program with confirmation', { tag: '@smoke' }, async ({ page }) => {
     const programName = uniqueName('Test Program');
 
     await createProgram(page, programName);
@@ -101,7 +101,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramNotInList(page, programName);
   });
 
-  test('DS-4-TC-002: Cancel program deletion', async ({ page, trackProgram }) => {
+  test('DS-4-TC-002: Cancel program deletion', { tag: '@sanity' }, async ({ page, trackProgram }) => {
     const programName = uniqueName('Test Program');
 
     await createProgram(page, programName, trackProgram);
@@ -113,7 +113,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramInList(page, programName);
   });
 
-  test('DS-4-TC-003: Program list updates without page refresh after delete', async ({ page }) => {
+  test('DS-4-TC-003: Program list updates without page refresh after delete', { tag: '@sanity' }, async ({ page }) => {
     const programName = uniqueName('No Refresh Delete Test');
 
     await createProgram(page, programName);
@@ -124,7 +124,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expect(page).toHaveURL(/\/programs/);
   });
 
-  test('DS-4-TC-004: Delete program with special characters in name', async ({ page }) => {
+  test('DS-4-TC-004: Delete program with special characters in name', { tag: '@regression' }, async ({ page }) => {
     const programName = uniqueName('Informatique & IA - Niveau 2');
 
     await createProgram(page, programName);
@@ -134,7 +134,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramNotInList(page, programName);
   });
 
-  test('DS-4-TC-005: Delete program with maximum length name', async ({ page }) => {
+  test('DS-4-TC-005: Delete program with maximum length name', { tag: '@regression' }, async ({ page }) => {
     const programName = `${'M'.repeat(MAX_NAME_LENGTH - 9)}${Date.now() % 100000}`.slice(0, MAX_NAME_LENGTH);
 
     await createProgram(page, programName);
@@ -144,7 +144,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramNotInList(page, programName);
   });
 
-  test('DS-4-TC-006: Delete program with Unicode and emoji in name', async ({ page }) => {
+  test('DS-4-TC-006: Delete program with Unicode and emoji in name', { tag: '@regression' }, async ({ page }) => {
     const programName = uniqueName('プログラム 🎓 2026');
 
     await createProgram(page, programName);
@@ -154,7 +154,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramNotInList(page, programName);
   });
 
-  test('DS-4-TC-007: Confirmation dialog displays program name', async ({ page, trackProgram }) => {
+  test('DS-4-TC-007: Confirmation dialog displays program name', { tag: '@sanity' }, async ({ page, trackProgram }) => {
     const programName = uniqueName('Test Program');
 
     await createProgram(page, programName, trackProgram);
@@ -163,7 +163,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expect(programsPage.deleteProgramModal.programNameReference(programName)).toBeVisible();
   });
 
-  test('DS-4-TC-008: Non-admin user cannot delete a program', async ({ page, trackProgram }) => {
+  test('DS-4-TC-008: Non-admin user cannot delete a program', { tag: '@e2e' }, async ({ page, trackProgram }) => {
     test.skip(
       !process.env.DIDAXIS_VIEWER_EMAIL || !process.env.DIDAXIS_VIEWER_PASSWORD,
       'Requires DIDAXIS_VIEWER_EMAIL and DIDAXIS_VIEWER_PASSWORD environment variables',
@@ -182,7 +182,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expect(page.getByRole('button', { name: /^Delete / })).toHaveCount(0);
   });
 
-  unauthenticatedTest('DS-4-TC-009: Unauthenticated user cannot delete a program', async ({ page }) => {
+  unauthenticatedTest('DS-4-TC-009: Unauthenticated user cannot delete a program', { tag: '@e2e' }, async ({ page }) => {
     await page.goto(PROGRAMS_URL);
     await expect(page).toHaveURL(/\/login/);
     await expect(page.getByLabel('Email')).toBeVisible();
@@ -192,7 +192,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     expect(response.status()).toBeLessThan(500);
   });
 
-  test('DS-4-TC-010: Delete fails gracefully on server error', async ({ page, trackProgram }) => {
+  test('DS-4-TC-010: Delete fails gracefully on server error', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programName = uniqueName('Test Program');
 
     await createProgram(page, programName, trackProgram);
@@ -211,11 +211,11 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expect(page.getByText(/fail|error|could not|unable|something went wrong/i)).toBeVisible();
   });
 
-  test('DS-4-TC-011: Cannot delete program already deleted by another user', async () => {
+  test('DS-4-TC-011: Cannot delete program already deleted by another user', { tag: '@regression' }, async () => {
     test.skip(true, 'Requires multi-session or API setup to delete program while confirmation dialog is open');
   });
 
-  test('DS-4-TC-012: Dismiss confirmation dialog via Esc or close control', async ({ page, trackProgram }) => {
+  test('DS-4-TC-012: Dismiss confirmation dialog via Esc or close control', { tag: '@regression' }, async ({ page, trackProgram }) => {
     const programName = uniqueName('Test Program');
 
     await createProgram(page, programName, trackProgram);
@@ -232,11 +232,11 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramInList(page, programName);
   });
 
-  test('DS-4-TC-013: Delete blocked when program has dependent curriculum', async () => {
+  test('DS-4-TC-013: Delete blocked when program has dependent curriculum', { tag: '@regression' }, async () => {
     test.skip(true, 'Requires program with linked curriculum — no API/UI setup available in E2E suite');
   });
 
-  test('DS-4-TC-014: Rapid double-click on confirm does not cause errors', async ({ page }) => {
+  test('DS-4-TC-014: Rapid double-click on confirm does not cause errors', { tag: '@regression' }, async ({ page }) => {
     const programName = uniqueName('Double Click Delete Test');
     let deleteCount = 0;
 
@@ -256,7 +256,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     expect(deleteCount).toBeLessThanOrEqual(1);
   });
 
-  test('DS-4-TC-015: Delete last remaining program in list', async ({ page }) => {
+  test('DS-4-TC-015: Delete last remaining program in list', { tag: '@regression' }, async ({ page }) => {
     const programName = uniqueName('Sole Program');
 
     await createProgram(page, programName);
@@ -266,7 +266,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramNotInList(page, programName);
   });
 
-  test('DS-4-TC-016: Delete one program when multiple programs exist', async ({ page, trackProgram }) => {
+  test('DS-4-TC-016: Delete one program when multiple programs exist', { tag: '@sanity' }, async ({ page, trackProgram }) => {
     const programA = uniqueName('Program A');
     const programB = uniqueName('Program B');
     const programC = uniqueName('Program C');
@@ -283,11 +283,11 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramInList(page, programC);
   });
 
-  test('DS-4-TC-017: Delete program with duplicate display name in list', async () => {
+  test('DS-4-TC-017: Delete program with duplicate display name in list', { tag: '@regression' }, async () => {
     test.skip(true, 'Duplicate program names are prevented by DS-3 — cannot create two programs with the same name');
   });
 
-  test('DS-4-TC-018: Delete program with HTML/script characters in name', async ({ page }) => {
+  test('DS-4-TC-018: Delete program with HTML/script characters in name', { tag: '@regression' }, async ({ page }) => {
     const programName = `<script>alert('xss')</script> ${Date.now()}`.slice(0, MAX_NAME_LENGTH);
     let dialogShown = false;
 
@@ -307,7 +307,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramNotInList(page, programName);
   });
 
-  test('DS-4-TC-019: Delete program with minimum length name (1 character)', async ({ page }) => {
+  test('DS-4-TC-019: Delete program with minimum length name (1 character)', { tag: '@regression' }, async ({ page }) => {
     const programName = `${Date.now() % 10}`;
 
     await createProgram(page, programName);
@@ -317,7 +317,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramNotInList(page, programName);
   });
 
-  test('DS-4-TC-020: Re-open delete dialog after cancel', async ({ page }) => {
+  test('DS-4-TC-020: Re-open delete dialog after cancel', { tag: '@regression' }, async ({ page }) => {
     const programName = uniqueName('Test Program');
 
     await createProgram(page, programName);
@@ -330,7 +330,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramNotInList(page, programName);
   });
 
-  test('DS-4-TC-021: Confirm deletion via keyboard', async ({ page }) => {
+  test('DS-4-TC-021: Confirm deletion via keyboard', { tag: '@sanity' }, async ({ page }) => {
     const programName = uniqueName('Keyboard Delete Test');
 
     await createProgram(page, programName);
@@ -341,7 +341,7 @@ test.describe('DS-4: Delete Program with Confirmation', () => {
     await expectProgramNotInList(page, programName);
   });
 
-  test('DS-4-TC-022: Delete program with leading/trailing whitespace in name', async ({ page }) => {
+  test('DS-4-TC-022: Delete program with leading/trailing whitespace in name', { tag: '@regression' }, async ({ page }) => {
     const storedName = uniqueName('Test Program');
     const paddedName = `  ${storedName}  `;
 
